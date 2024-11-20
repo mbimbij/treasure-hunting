@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class TreasureHuntingApplicationShould {
     @Test
-    void run_unit_tests() {
-        assertThat(true).isFalse();
+    void can_create_world() {
+        World world = new World();
     }
 }
