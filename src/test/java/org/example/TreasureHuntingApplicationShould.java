@@ -19,7 +19,7 @@ class TreasureHuntingApplicationShould {
         Integer height = pair.second();
 
         // WHEN
-        Territory madreDeDios = new Territory(width, height, emptyList());
+        Territory madreDeDios = new Territory(width, height, emptyList(), emptyList());
 
         // THEN
         assertThat(madreDeDios.getWidth()).isEqualTo(width);
@@ -33,7 +33,10 @@ class TreasureHuntingApplicationShould {
         Integer height = pair.second();
 
         // WHEN
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(width, height, emptyList());
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(width,
+                height,
+                emptyList(),
+                emptyList());
 
         // THEN
         assertThatThrownBy(throwingCallable)
@@ -45,12 +48,12 @@ class TreasureHuntingApplicationShould {
     void create_territory_with_mountains() {
         // GIVEN
         List<Mountain> mountains = List.of(
-                new Mountain(1, 1),
-                new Mountain(2, 2)
+                getMountain(1, 1),
+                getMountain(2, 2)
         );
 
         // WHEN
-        Territory madreDeDios = new Territory(3, 4, mountains);
+        Territory madreDeDios = new Territory(3, 4, mountains, emptyList());
 
         // THEN
         assertThat(madreDeDios.getMountains())
@@ -58,22 +61,80 @@ class TreasureHuntingApplicationShould {
                 .isEqualTo(mountains);
     }
 
+    /**
+     * Assumption to validate with Product Owner: overlapping mountains are probably an error, and we would rather fail
+     * fast than producing silent erroneous results. The PO might want the overlapping moutains to be ignored and
+     * considered as one.
+     */
     @Test
     void throw_exception_if_overlapping_mountains() {
         // GIVEN
+        int westEastCoordinate = 1;
+        int northSouthCoordinate = 1;
         List<Mountain> mountains = List.of(
-                new Mountain(1, 1),
-                new Mountain(1, 1),
-                new Mountain(2, 2)
+                getMountain(westEastCoordinate, northSouthCoordinate),
+                getMountain(1, 1)
         );
 
         // WHEN
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(3, 4, mountains);
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(3,
+                4,
+                mountains,
+                emptyList());
 
         // THEN
         assertThatThrownBy(throwingCallable)
                 .isInstanceOf(IllegalArgumentException.class)
+                // TODO improve the message and print the coordinates of the overlapping mountains
                 .hasMessage("Cannot build territory because of overlapping mountains.");
+    }
+
+    private static Mountain getMountain(int westEastCoordinate, int northSouthCoordinate) {
+        return Mountain.plop(westEastCoordinate, northSouthCoordinate);
+    }
+
+    @Test
+    void create_territory_with_treasures() {
+        // GIVEN
+        List<Treasure> treasures = List.of(
+                new Treasure(new Coordinates(1, 1), 1),
+                new Treasure(new Coordinates(2, 2), 2)
+        );
+
+        // WHEN
+        Territory madreDeDios = new Territory(3, 4, emptyList(), treasures);
+
+        // THEN
+        assertThat(madreDeDios.getTreasures())
+                .usingRecursiveFieldByFieldElementComparator()
+                .isEqualTo(treasures);
+    }
+
+    /**
+     * Assumption to validate with Product Owner: overlapping treasure are considered as errors, and we would rather
+     * fail fast. The PO might have another opinion on the matter, like adding the treasure or ignoring all except the
+     * first or last one.
+     */
+    @Test
+    void throw_exception_if_overlapping_treasures() {
+        // GIVEN
+        List<Treasure> treasures = List.of(
+                new Treasure(new Coordinates(1, 2), 3),
+                new Treasure(new Coordinates(1, 2), 2),
+                new Treasure(new Coordinates(2, 2), 2)
+        );
+
+        // WHEN
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(3,
+                4,
+                emptyList(),
+                treasures);
+
+        // THEN
+        assertThatThrownBy(throwingCallable)
+                .isInstanceOf(IllegalArgumentException.class)
+                // TODO improve the message and print the coordinates of the overlapping treasures
+                .hasMessage("Cannot build territory because of overlapping treasures.");
     }
 
     @Provide
