@@ -58,6 +58,24 @@ class TreasureHuntingApplicationShould {
                 .isEqualTo(mountains);
     }
 
+    @Test
+    void throw_exception_if_overlapping_mountains() {
+        // GIVEN
+        List<Mountain> mountains = List.of(
+                new Mountain(1, 1),
+                new Mountain(1, 1),
+                new Mountain(2, 2)
+        );
+
+        // WHEN
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(3, 4, mountains);
+
+        // THEN
+        assertThatThrownBy(throwingCallable)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Cannot build territory because of overlapping mountains.");
+    }
+
     @Provide
     Arbitrary<IntegerPair> validPairsOfWidthAndHeight() {
         IntegerArbitrary integers = Arbitraries.integers().between(-100, 100);

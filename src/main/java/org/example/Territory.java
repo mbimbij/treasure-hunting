@@ -6,8 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represent 'Madre de Dios' territory. I opted for a noun for the class name and 'Madre de Dios' for the instance
- * name.
+ * Represent 'Madre de Dios' territory. I opted for a noun for the class name and 'Madre de Dios' for the instance.
+ * name. "Carte" translates to "Map", and I didn't want to have potential collisions with java.util.Map, so I decided on
+ * "Territory".
  */
 @Getter
 public class Territory {
@@ -40,5 +41,12 @@ public class Territory {
         if (this.width <= 0 || this.height <= 0) {
             throw new IllegalArgumentException("Width and height must be greater than zero");
         }
+        if(overlappingMountains()){
+            throw new IllegalArgumentException("Cannot build territory because of overlapping mountains.");
+        }
+    }
+
+    private boolean overlappingMountains() {
+        return this.mountains.stream().distinct().count() < this.mountains.size();
     }
 }
