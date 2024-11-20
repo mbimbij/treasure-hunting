@@ -19,7 +19,11 @@ class TreasureHuntingApplicationShould {
         Integer height = pair.second();
 
         // WHEN
-        Territory madreDeDios = new Territory(width, height, emptyList(), emptyList());
+        Territory madreDeDios = new Territory(width,
+                height,
+                emptyList(),
+                emptyList(),
+                emptyList());
 
         // THEN
         assertThat(madreDeDios.getWidth()).isEqualTo(width);
@@ -35,6 +39,7 @@ class TreasureHuntingApplicationShould {
         // WHEN
         ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(width,
                 height,
+                emptyList(),
                 emptyList(),
                 emptyList());
 
@@ -53,7 +58,11 @@ class TreasureHuntingApplicationShould {
         );
 
         // WHEN
-        Territory madreDeDios = new Territory(3, 4, mountains, emptyList());
+        Territory madreDeDios = new Territory(3,
+                4,
+                mountains,
+                emptyList(),
+                emptyList());
 
         // THEN
         assertThat(madreDeDios.getMountains())
@@ -80,6 +89,7 @@ class TreasureHuntingApplicationShould {
         ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(3,
                 4,
                 mountains,
+                emptyList(),
                 emptyList());
 
         // THEN
@@ -102,7 +112,11 @@ class TreasureHuntingApplicationShould {
         );
 
         // WHEN
-        Territory madreDeDios = new Territory(3, 4, emptyList(), treasures);
+        Territory madreDeDios = new Territory(3,
+                4,
+                emptyList(),
+                treasures,
+                emptyList());
 
         // THEN
         assertThat(madreDeDios.getTreasures())
@@ -125,16 +139,40 @@ class TreasureHuntingApplicationShould {
         );
 
         // WHEN
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(3,
-                4,
-                emptyList(),
-                treasures);
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(3, 4, emptyList(), treasures, emptyList());
 
         // THEN
         assertThatThrownBy(throwingCallable)
                 .isInstanceOf(IllegalArgumentException.class)
                 // TODO improve the message and print the coordinates of the overlapping treasures
                 .hasMessage("Cannot build territory because of overlapping treasures.");
+    }
+
+    @Test
+    void create_territory_with_adventurers() {
+        // GIVEN
+        List<Adventurer> adventurers = List.of(
+                new Adventurer("Adventurer #1",
+                        new Coordinates(1, 1),
+                        Orientation.NORTH,
+                        0),
+                new Adventurer("Adventurer #2",
+                        new Coordinates(2, 2),
+                        Orientation.NORTH,
+                        0)
+        );
+
+        // WHEN
+        Territory madreDeDios = new Territory(3,
+                4,
+                emptyList(),
+                emptyList(),
+                adventurers);
+
+        // THEN
+        assertThat(madreDeDios.getAdventurers())
+                .usingRecursiveFieldByFieldElementComparator()
+                .isEqualTo(adventurers);
     }
 
     @Provide
