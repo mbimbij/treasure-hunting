@@ -1,15 +1,22 @@
 package org.example;
 
-import org.assertj.core.api.Assertions;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
-
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class TreasureHuntingApplicationShould {
     @Test
     void can_create_world() {
-        World world = new World();
+        // GIVEN
+        int width = 3;
+        int height =4;
+
+        // WHEN
+        Territory madreDeDios = new Territory(width, height);
+
+        // THEN
+        SoftAssertions.assertSoftly(sa -> {
+            sa.assertThat(madreDeDios.getWidth()).isEqualTo(width);
+            sa.assertThat(madreDeDios.getHeight()).isEqualTo(height);
+        });
     }
 }
