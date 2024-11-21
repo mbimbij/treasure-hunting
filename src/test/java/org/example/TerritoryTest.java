@@ -212,6 +212,18 @@ class TerritoryTest {
         assertThat(player1.getCoordinates()).isEqualTo(expectedCoordinates);
     }
 
+    /**
+     * Uses a map similar to the one described in the instructions <br/>
+     * <table border="1">
+     * <tr><td>.</td><td>T(3)</td><td>T(0)</td><td>T(7)</td></tr>
+     * </table>
+     * <br/>
+     * Or, in non formatted javadoc:
+     * .    T(3)  T(0)  T(7)
+     *
+     * @param player1
+     * @param expectedCoordinates
+     */
     @Test
     void collect_treasure_iff_moving_on_it_and_non_empty() {
         // GIVEN
@@ -222,8 +234,11 @@ class TerritoryTest {
                 height,
                 emptyList(),
                 of(
+                        // Will be collected twice
                         new Treasure(1, 0, 3),
+                        // Won't be collected
                         new Treasure(2, 0, 0),
+                        // Will be collected once
                         new Treasure(3, 0, 7)
                 ),
                 of(player));
