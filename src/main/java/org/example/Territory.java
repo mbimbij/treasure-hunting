@@ -1,10 +1,13 @@
 package org.example;
 
+import com.speedment.common.mapstream.MapStream;
 import lombok.Getter;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static java.util.function.Function.identity;
 
 /**
  * Represent 'Madre de Dios' territory. I opted for a noun for the class name and 'Madre de Dios' for the instance.
@@ -31,6 +34,7 @@ public class Territory {
     private void validate() {
         validateTerritorySize();
         validateNoOverlappingFeatures();
+        validateNoDuplicateAdventurerName();
     }
 
     private void validateTerritorySize() {
@@ -45,12 +49,32 @@ public class Territory {
      */
     private void validateNoOverlappingFeatures() {
         List<Coordinates> allFeaturesCoordinates = getAllFeaturesCoordinates();
-        HashMap<Coordinates, Long> featuresCountByCoordinate = getFeaturesCountByCoordinate(allFeaturesCoordinates);
-        Map<Coordinates, Long> overlapsCountByCoordinate = getOverlapsCountByCoordinate(featuresCountByCoordinate);
+        Map<Coordinates, Long> featuresCountByCoordinate = allFeaturesCoordinates.stream()
+                .collect(Collectors.groupingBy(identity(),
+                        Collectors.counting()));
+
+        Map<Coordinates, Long> overlapsCountByCoordinate = MapStream.of(featuresCountByCoordinate)
+                .filterValue(count -> count > 1)
+                .toMap();
 
         if(!overlapsCountByCoordinate.isEmpty()){
             String overlapsString = overlapsCountByCoordinate.keySet().toString();
             String message = "Cannot build territory because of overlapping features at %s".formatted(overlapsString);
+            throw new IllegalArgumentException(message);
+        }
+    }
+
+    private void validateNoDuplicateAdventurerName() {
+        Map<String, Long> adventurersCountByName = this.adventurers.stream()
+                .collect(Collectors.groupingBy(Adventurer::getName, Collectors.counting()));
+
+        Map<String, Long> duplicateAdventurersNames = MapStream.of(adventurersCountByName)
+                .filterValue(count -> count > 1)
+                .toMap();
+
+        if(!duplicateAdventurersNames.isEmpty()){
+            String duplicateAdventurersNamesString = duplicateAdventurersNames.keySet().toString();
+            String message = "Cannot build territory because of duplicate adventurers names: %s".formatted(duplicateAdventurersNamesString);
             throw new IllegalArgumentException(message);
         }
     }
@@ -66,17 +90,4 @@ public class Territory {
         return allFeaturesCoordinates;
     }
 
-    private static HashMap<Coordinates, Long> getFeaturesCountByCoordinate(List<Coordinates> allFeaturesCoordinates) {
-        return allFeaturesCoordinates.stream()
-                .collect(Collectors.groupingBy(Function.identity(),
-                        HashMap::new,
-                        Collectors.counting()));
-    }
-
-    private static Map<Coordinates, Long> getOverlapsCountByCoordinate(Map<Coordinates, Long> featuresCountByCoordinate) {
-        return featuresCountByCoordinate.entrySet()
-                .stream()
-                .filter(entry -> entry.getValue() > 1)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    }
 }

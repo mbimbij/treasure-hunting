@@ -114,8 +114,44 @@ class TreasureHuntingApplicationShould {
                 .isEqualTo(adventurers);
     }
 
+    @Property
+    void throw_exception_for_invalid_width_or_height(@ForAll("invalidPairsOfWidthAndHeight") IntegerPair pair) {
+        // GIVEN
+        Integer width = pair.first();
+        Integer height = pair.second();
+
+        // WHEN
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(width,
+                height,
+                emptyList(),
+                emptyList(),
+                emptyList());
+
+        // THEN
+        assertThatThrownBy(throwingCallable)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageStartingWith("Width and height must be greater than zero but were");
+    }
+
+    @Provide
+    Arbitrary<IntegerPair> validPairsOfWidthAndHeight() {
+        return Combinators.combine(integers(), integers())
+                .filter((integer, integer2) -> integer > 0 && integer2 > 0)
+                .as(IntegerPair::new);
+    }
+
+    @Provide
+    private Arbitrary<IntegerPair> invalidPairsOfWidthAndHeight() {
+        return Combinators.combine(integers(), integers())
+                .filter((integer, integer2) -> integer <= 0 || integer2 <= 0)
+                .as(IntegerPair::new);
+    }
+
+    /**
+     * Because JQwik tests are not executed in non-static inner classes, but junit @Nested test classes must be non-static
+     */
     @Nested
-    class ErrorCases {
+    class NonPBTErrorCases {
 
         private static final List<Adventurer> OVERLAPPING_ADVENTURERS = of(
                 ADVENTURER_1,
@@ -162,23 +198,25 @@ class TreasureHuntingApplicationShould {
                     .hasMessageStartingWith("Cannot build territory because of overlapping features at");
         }
 
-        @Property
-        void throw_exception_for_invalid_width_or_height(@ForAll("invalidPairsOfWidthAndHeight") IntegerPair pair) {
+        @Test
+        void throw_exception_if_2_adventurers_have_same_name() {
             // GIVEN
-            Integer width = pair.first();
-            Integer height = pair.second();
+            List<Adventurer> adventurers = of(
+                    ADVENTURER_1,
+                    ADVENTURER_2.withName(ADVENTURER_1.getName())
+            );
 
             // WHEN
-            ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(width,
-                    height,
+            ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(3,
+                    4,
                     emptyList(),
                     emptyList(),
-                    emptyList());
+                    adventurers);
 
             // THEN
             assertThatThrownBy(throwingCallable)
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageStartingWith("Width and height must be greater than zero but were");
+                    .hasMessage("Cannot build territory because of duplicate adventurers names: [%s]".formatted(ADVENTURER_1.getName()));
         }
 
         private static Stream<Arguments> throw_exception_if_overlapping_features() {
@@ -187,25 +225,11 @@ class TreasureHuntingApplicationShould {
                     Arguments.of(emptyList(), OVERLAPPING_TREASURES, emptyList()),
                     Arguments.of(emptyList(), emptyList(), OVERLAPPING_ADVENTURERS),
                     Arguments.of(of(MOUNTAIN_AT_1_1), of(TREASURE_AT_1_1), emptyList()),
-                    Arguments.of(of(MOUNTAIN_AT_1_1), emptyList(), of (ADVENTURER_1)),
-                    Arguments.of(emptyList(), of(TREASURE_AT_1_1), of (ADVENTURER_1)),
-                    Arguments.of(of(MOUNTAIN_AT_1_1), of(TREASURE_AT_1_1), of (ADVENTURER_1))
+                    Arguments.of(of(MOUNTAIN_AT_1_1), emptyList(), of(ADVENTURER_1)),
+                    Arguments.of(emptyList(), of(TREASURE_AT_1_1), of(ADVENTURER_1)),
+                    Arguments.of(of(MOUNTAIN_AT_1_1), of(TREASURE_AT_1_1), of(ADVENTURER_1))
             );
         }
-
-        @Provide
-        private Arbitrary<IntegerPair> invalidPairsOfWidthAndHeight() {
-            return Combinators.combine(integers(), integers())
-                    .filter((integer, integer2) -> integer <= 0 || integer2 <= 0)
-                    .as(IntegerPair::new);
-        }
-    }
-
-    @Provide
-    Arbitrary<IntegerPair> validPairsOfWidthAndHeight() {
-        return Combinators.combine(integers(), integers())
-                .filter((integer, integer2) -> integer > 0 && integer2 > 0)
-                .as(IntegerPair::new);
     }
 
     record IntegerPair(Integer first, Integer second) {
