@@ -3,6 +3,8 @@ package org.example;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
@@ -34,6 +36,32 @@ class PlayerShould {
         player.moveForward();
         assertThat(player.getCoordinates()).isEqualTo(expectedCoordinates);
         assertThat(player.getOrientation()).isEqualTo(expectedOrientation);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+            "NORTH, WEST",
+            "WEST, SOUTH",
+            "SOUTH, EAST",
+            "EAST, NORTH",
+    })
+    void turn_left(Orientation initialOrientation, Orientation expectedOrientationAfter) {
+        Player player = new Player("player", new Coordinates(1, 1), initialOrientation);
+        player.turnLeft();
+        assertThat(player.getOrientation()).isEqualTo(expectedOrientationAfter);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+            "NORTH, EAST",
+            "EAST, SOUTH",
+            "SOUTH, WEST",
+            "WEST, NORTH",
+    })
+    void turn_right(Orientation initialOrientation, Orientation expectedOrientationAfter) {
+        Player player = new Player("player", new Coordinates(1, 1), initialOrientation);
+        player.turnRight();
+        assertThat(player.getOrientation()).isEqualTo(expectedOrientationAfter);
     }
 
     static Stream<Arguments> move_forward(){
