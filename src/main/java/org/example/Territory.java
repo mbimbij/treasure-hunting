@@ -20,6 +20,9 @@ public class Territory {
     private final List<Mountain> mountains;
     private final List<Treasure> treasures;
     private final List<Player> players;
+    public static final String OVERLAPPING_FEATURES_ERROR_MESSAGE_FORMAT = "Cannot build territory because of overlapping features at %s";
+    public static final String DUPLICATE_PLAYERS_NAMES_ERROR_MESSAGE_FORMAT = "Cannot build territory because of duplicate players names: %s";
+    public static final String INVALID_TERRITORY_SIZE_ERROR_MESSAGE_FORMAT = "Width and height must be greater than zero but were {%d, %d}";
 
     public Territory(int width, int height, List<Mountain> mountains, List<Treasure> treasures, List<Player> players) {
         this.width = width;
@@ -38,8 +41,8 @@ public class Territory {
 
     private void validateTerritorySize() {
         if (this.width <= 0 || this.height <= 0) {
-            throw new IllegalArgumentException("Width and height must be greater than zero but were {%d, %d}"
-                    .formatted(width, height));
+            String message = INVALID_TERRITORY_SIZE_ERROR_MESSAGE_FORMAT.formatted(width, height);
+            throw new IllegalArgumentException(message);
         }
     }
 
@@ -58,7 +61,7 @@ public class Territory {
 
         if(!overlapsCountByCoordinate.isEmpty()){
             String overlapsString = overlapsCountByCoordinate.keySet().toString();
-            String message = "Cannot build territory because of overlapping features at %s".formatted(overlapsString);
+            String message = OVERLAPPING_FEATURES_ERROR_MESSAGE_FORMAT.formatted(overlapsString);
             throw new IllegalArgumentException(message);
         }
     }
@@ -72,8 +75,8 @@ public class Territory {
                 .toMap();
 
         if(!duplicateAlayersNames.isEmpty()){
-            String duplicateAlayersNamesString = duplicateAlayersNames.keySet().toString();
-            String message = "Cannot build territory because of duplicate players names: %s".formatted(duplicateAlayersNamesString);
+            String duplicatePlayersNamesString = duplicateAlayersNames.keySet().toString();
+            String message = DUPLICATE_PLAYERS_NAMES_ERROR_MESSAGE_FORMAT.formatted(duplicatePlayersNamesString);
             throw new IllegalArgumentException(message);
         }
     }

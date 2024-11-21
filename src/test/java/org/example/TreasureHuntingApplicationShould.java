@@ -119,6 +119,7 @@ class TreasureHuntingApplicationShould {
         // GIVEN
         Integer width = pair.first();
         Integer height = pair.second();
+        String expectedErrorMessage = Territory.INVALID_TERRITORY_SIZE_ERROR_MESSAGE_FORMAT.formatted(width, height);
 
         // WHEN
         ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(width,
@@ -130,7 +131,7 @@ class TreasureHuntingApplicationShould {
         // THEN
         assertThatThrownBy(throwingCallable)
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageStartingWith("Width and height must be greater than zero but were");
+                .hasMessageStartingWith(expectedErrorMessage);
     }
 
     @Provide
@@ -185,6 +186,11 @@ class TreasureHuntingApplicationShould {
         void throw_exception_if_overlapping_features(List<Mountain> mountains,
                                                      List<Treasure> treasures,
                                                      List<Player> players) {
+            // GIVEN
+            List<Coordinates> expectedOverlap = of(COORDINATES_1_1);
+            String expectedErrorMessage = Territory.OVERLAPPING_FEATURES_ERROR_MESSAGE_FORMAT
+                    .formatted(expectedOverlap);
+
             // WHEN
             ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(3,
                     4,
@@ -195,16 +201,19 @@ class TreasureHuntingApplicationShould {
             // THEN
             assertThatThrownBy(throwingCallable)
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageStartingWith("Cannot build territory because of overlapping features at");
+                    .hasMessageStartingWith(expectedErrorMessage);
         }
 
         @Test
-        void throw_exception_if_2_players_have_same_name() {
+        void throw_exception_if_multiple_players_have_the_same_name() {
             // GIVEN
             List<Player> players = of(
                     PLAYER_1,
                     PLAYER_2.withName(PLAYER_1.getName())
             );
+            List<String> duplicatePlayersNames = of(PLAYER_1.getName());
+            String expectedErrorMessage = Territory.DUPLICATE_PLAYERS_NAMES_ERROR_MESSAGE_FORMAT
+                    .formatted(duplicatePlayersNames);
 
             // WHEN
             ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(3,
@@ -216,7 +225,7 @@ class TreasureHuntingApplicationShould {
             // THEN
             assertThatThrownBy(throwingCallable)
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("Cannot build territory because of duplicate players names: [%s]".formatted(PLAYER_1.getName()));
+                    .hasMessage(expectedErrorMessage);
         }
 
         private static Stream<Arguments> throw_exception_if_overlapping_features() {
