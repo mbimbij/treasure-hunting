@@ -195,4 +195,15 @@ public class Territory {
     public void turnRight(Player player) {
         player.turnRight();
     }
+
+    public void runSimulation() {
+        Player player = players.getFirst();
+        player.getRemainingCommands().forEach(command ->{
+           switch (command){
+               case A -> moveForward(player);
+               case G -> turnLeft(player);
+               case D -> turnRight(player);
+           }
+        });
+    }
 }
