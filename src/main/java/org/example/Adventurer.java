@@ -2,6 +2,8 @@ package org.example;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
+import lombok.With;
 
 /**
  * Not making it a record, as the treasure count will be mutable, and returning a new instance with changed state feels
@@ -17,6 +19,8 @@ import lombok.Getter;
  */
 @Getter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@With
+@ToString(includeFieldNames = false)
 public class Adventurer {
     @EqualsAndHashCode.Include
     private final String name;
