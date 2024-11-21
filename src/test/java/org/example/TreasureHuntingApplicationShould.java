@@ -1,7 +1,6 @@
 package org.example;
 
 import net.jqwik.api.*;
-import net.jqwik.api.arbitraries.IntegerArbitrary;
 import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.Test;
 
@@ -13,6 +12,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class TreasureHuntingApplicationShould {
+
+    private final Coordinates coordinates_1_1 = new Coordinates(1, 1);
+    private final Coordinates coordinates_1_2 = new Coordinates(1, 2);
+
     @Property
     void create_territory_with_specified_size(@ForAll("validPairsOfWidthAndHeight") IntegerPair pair) {
         // GIVEN
@@ -54,8 +57,8 @@ class TreasureHuntingApplicationShould {
     void create_territory_with_mountains() {
         // GIVEN
         List<Mountain> mountains = List.of(
-                getMountain(1, 1),
-                getMountain(2, 2)
+                new Mountain(coordinates_1_1),
+                new Mountain(coordinates_1_2)
         );
 
         // WHEN
@@ -79,11 +82,9 @@ class TreasureHuntingApplicationShould {
     @Test
     void throw_exception_if_overlapping_mountains() {
         // GIVEN
-        int westEastCoordinate = 1;
-        int northSouthCoordinate = 1;
         List<Mountain> mountains = List.of(
-                getMountain(westEastCoordinate, northSouthCoordinate),
-                getMountain(1, 1)
+                new Mountain(coordinates_1_1),
+                new Mountain(coordinates_1_1)
         );
 
         // WHEN
@@ -100,16 +101,12 @@ class TreasureHuntingApplicationShould {
                 .hasMessage("Cannot build territory because of overlapping mountains.");
     }
 
-    private static Mountain getMountain(int westEastCoordinate, int northSouthCoordinate) {
-        return Mountain.plop(westEastCoordinate, northSouthCoordinate);
-    }
-
     @Test
     void create_territory_with_treasures() {
         // GIVEN
         List<Treasure> treasures = List.of(
-                new Treasure(new Coordinates(1, 1), 1),
-                new Treasure(new Coordinates(2, 2), 2)
+                new Treasure(coordinates_1_1, 1),
+                new Treasure(coordinates_1_2, 2)
         );
 
         // WHEN
@@ -134,9 +131,9 @@ class TreasureHuntingApplicationShould {
     void throw_exception_if_overlapping_treasures() {
         // GIVEN
         List<Treasure> treasures = List.of(
-                new Treasure(new Coordinates(1, 2), 3),
-                new Treasure(new Coordinates(1, 2), 2),
-                new Treasure(new Coordinates(2, 2), 2)
+                new Treasure(coordinates_1_1, 3),
+                new Treasure(coordinates_1_1, 2),
+                new Treasure(coordinates_1_2, 2)
         );
 
         // WHEN
@@ -154,11 +151,11 @@ class TreasureHuntingApplicationShould {
         // GIVEN
         List<Adventurer> adventurers = List.of(
                 new Adventurer("Adventurer #1",
-                        new Coordinates(1, 1),
+                        coordinates_1_1,
                         Orientation.NORTH,
                         0),
                 new Adventurer("Adventurer #2",
-                        new Coordinates(2, 2),
+                        coordinates_1_2,
                         Orientation.NORTH,
                         0)
         );
