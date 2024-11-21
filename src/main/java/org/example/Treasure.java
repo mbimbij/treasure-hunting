@@ -25,7 +25,7 @@ public final class Treasure implements CanCollideWith {
     }
 
     public void collectTreasure() {
-        if (this.quantity == 0) {
+        if (this.isEmpty()) {
             throw new IllegalStateException(COLLECT_EMPTY_TREASURE_ERROR_MESSAGE);
         }
         this.quantity--;
@@ -38,5 +38,9 @@ public final class Treasure implements CanCollideWith {
 
     public int quantity() {
         return quantity;
+    }
+
+    boolean isEmpty() {
+        return quantity() <= 0;
     }
 }

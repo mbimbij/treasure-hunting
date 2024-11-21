@@ -9,9 +9,12 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static java.util.List.of;
 import static net.jqwik.api.Arbitraries.integers;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -165,8 +168,7 @@ class TerritoryTest {
     }
 
     /**
-     * Uses a map similar to the one described in the instructions
-     * <br/>
+     * Uses a map similar to the one described in the instructions <br/>
      * <table border="1">
      * <tr><td>.</td><td>M</td><td>.</td></tr>
      * <tr><td>.</td><td>.</td><td>M</td></tr>
@@ -211,29 +213,36 @@ class TerritoryTest {
     }
 
     @Test
-    void collect_treasure_if_stepping_on_treasure_but_not_if_staying_on_it() {
+    void collect_treasure_iff_moving_on_it_and_non_empty() {
         // GIVEN
-        int width = 3;
-        int height = 4;
-        Player player1 = new Player("p2", new Coordinates(0, 2), SOUTH);
+        int width = 4;
+        int height = 1;
+        Player player = new Player("player", new Coordinates(0, 0), EAST);
         Territory territory = new Territory(width,
                 height,
-                of(new Mountain(1, 0),
-                        new Mountain(2, 1),
-                        new Mountain(1, 2)
-                ),
+                emptyList(),
                 of(
-                        new Treasure(0, 3, 2),
-                        new Treasure(1, 3, 3)
+                        new Treasure(1, 0, 3),
+                        new Treasure(2, 0, 0),
+                        new Treasure(3, 0, 7)
                 ),
-                of(player1));
+                of(player));
 
         // WHEN
-        territory.moveForward(player1);
+        territory.moveForward(player);
+        territory.moveForward(player);
+        territory.moveForward(player);
+        territory.turnRight(player);
+        territory.turnRight(player);
+        territory.moveForward(player);
+        territory.moveForward(player);
+        territory.moveForward(player);
 
         // THEN
-        assertThat(player1.getCollectedTreasuresCount()).isEqualTo(1);
+        assertThat(player.getCollectedTreasuresCount()).isEqualTo(3);
+        assertThat(territory.getTreasures()).extracting(Treasure::quantity).isEqualTo(of(1, 0, 6));
     }
+
 
     private static Stream<Arguments> should_move_player_forward_respecting_boundaries_and_collisions() {
         Player facingNoObstacle = new Player("player1", new Coordinates(0, 1), NORTH);
@@ -289,6 +298,7 @@ class TerritoryTest {
                 .filter((integer, integer2) -> integer <= 0 || integer2 <= 0)
                 .as(IntegerPair::new);
     }
+
     /**
      * Because JQwik tests are not executed in non-static inner classes, but junit @Nested test classes must be
      * non-static
@@ -346,6 +356,7 @@ class TerritoryTest {
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageStartingWith(expectedErrorMessage);
         }
+
         private static Stream<Arguments> throw_exception_if_overlapping_features() {
             return Stream.of(
                     Arguments.of(OVERLAPPING_MOUNTAINS, emptyList(), emptyList()),
@@ -359,6 +370,7 @@ class TerritoryTest {
         }
 
     }
+
     @Nested
     class OutOfBoundFeatures {
 
@@ -425,11 +437,13 @@ class TerritoryTest {
         private static Coordinates tooMuchEast() {
             return new Coordinates(width + 2, 2);
         }
+
         private static Coordinates tooMuchWest() {
             return new Coordinates(-1, 2);
         }
 
     }
+
     record IntegerPair(Integer first, Integer second) {
 
 

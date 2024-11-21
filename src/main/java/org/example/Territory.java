@@ -104,6 +104,7 @@ public class Territory {
 
     /**
      * TODO validate with PO: an player cannot have its initial coordinates equal to one of the treasure.
+     * TODO explicit what features overlap to help with debugging (mountain, treasure, and later what line in the input file)
      */
     private void validateNoOverlappingFeatures() {
         List<Coordinates> allFeaturesCoordinates = getAllFeaturesCoordinates();
@@ -156,20 +157,23 @@ public class Territory {
             return;
         }
         player.moveForward();
-        Optional<Treasure> treasure1 = getTreasure(player);
-        treasure1
-                .ifPresent(t -> {
-                    t.collectTreasure();
-                    player.collectTreasure();
-                });
+        collectTreasureIfApplicable(player);
     }
 
-    private Optional<Treasure> getTreasure(Player player) {
+    private void collectTreasureIfApplicable(Player player) {
+        Optional<Treasure> nonEmptyTreasure = getNonEmptyTreasureAtPlayersPosition(player.getCoordinates());
+        nonEmptyTreasure.ifPresent(t -> {
+            t.collectTreasure();
+            player.collectTreasure();
+        });
+    }
+
+    private Optional<Treasure> getNonEmptyTreasureAtPlayersPosition(Coordinates playerCoordinates) {
         return this.treasures
                 .stream()
-                .filter(treasure -> treasure.collidesWith(player.getCoordinates()))
+                .filter(treasure -> treasure.collidesWith(playerCoordinates))
                 .findAny()
-                .filter(treasure -> treasure.quantity() > 0);
+                .filter(treasure -> !treasure.isEmpty());
     }
 
     private boolean collidesWithMountain(Coordinates futurePosition) {
@@ -184,4 +188,11 @@ public class Territory {
                 .anyMatch(otherPlayer -> otherPlayer.collidesWith(futurePosition));
     }
 
+    public void turnLeft(Player player) {
+        player.turnLeft();
+    }
+
+    public void turnRight(Player player) {
+        player.turnRight();
+    }
 }
