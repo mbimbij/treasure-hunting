@@ -4,6 +4,7 @@ import lombok.*;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Queue;
 
 /**
@@ -79,5 +80,13 @@ public class Player implements CanCollideWith {
 
     public void collectTreasure() {
         this.collectedTreasuresCount++;
+    }
+
+    public Optional<Command> popNextCommand() {
+        return Optional.ofNullable(this.remainingCommands.poll());
+    }
+
+    boolean hasRemainingCommands() {
+        return !getRemainingCommands().isEmpty();
     }
 }

@@ -298,6 +298,33 @@ class TerritoryShould {
         inOrder.verify(territory).turnLeft(player);
     }
 
+    @Test
+    void execute_sequence_of_commands_on_multiple_players() {
+        // GIVEN
+        int width = 3;
+        int height = 2;
+
+        Player player1 = new Player("player", new Coordinates(0, 0), EAST, of(A, G, D));
+        Player player2 = new Player("player2", new Coordinates(2, 1), WEST, of(D, A, G));
+        Territory territory = spy(new Territory(width,
+                height,
+                emptyList(),
+                emptyList(),
+                of(player1, player2)));
+
+        // WHEN
+        territory.runSimulation();
+
+        // THEN
+        InOrder inOrder = inOrder(territory);
+        inOrder.verify(territory).moveForward(player1);
+        inOrder.verify(territory).turnRight(player2);
+        inOrder.verify(territory).turnLeft(player1);
+        inOrder.verify(territory).moveForward(player2);
+        inOrder.verify(territory).turnRight(player1);
+        inOrder.verify(territory).turnLeft(player2);
+    }
+
     private static Stream<Arguments> should_move_player_forward_respecting_boundaries_and_collisions() {
         Player facingNoObstacle = new Player("player1", new Coordinates(0, 1), NORTH);
         Player facingNorthernLimit = new Player("player1", new Coordinates(0, 0), NORTH);
