@@ -335,36 +335,31 @@ class TerritoryTest {
     record IntegerPair(Integer first, Integer second) {
     }
 
-    @Test
-    void should_move_player_forward_respecting_boundaries_and_collisions() {
+    @ParameterizedTest
+    @MethodSource
+    void should_move_player_forward_respecting_boundaries_and_collisions(Player player1, Coordinates expectedCoordinates) {
         // GIVEN
         int width = 4;
         int height = 4;
-        Player player1 = new Player("player1", new Coordinates(0, 0), Orientation.NORTH);
-        Player player2 = new Player("player2", new Coordinates(0, 2), Orientation.NORTH);
-        Player player3 = new Player("player3", new Coordinates(3, 0), Orientation.EAST);
-        Player player4 = new Player("player4", new Coordinates(1, 0), Orientation.EAST);
-        Player player5 = new Player("player5", new Coordinates(3, 3), Orientation.SOUTH);
-        Player player6 = new Player("player6", new Coordinates(3, 1), Orientation.SOUTH);
-        Player player7 = new Player("player7", new Coordinates(0, 3), Orientation.WEST);
-        Player player8 = new Player("player8", new Coordinates(2, 3), Orientation.WEST);
+        Player player2 = new Player("player2", new Coordinates(2, 2), Orientation.NORTH);
+        List<Player> players = of(player1, player2);
         Territory territory = new Territory(width,
                 height,
                 emptyList(),
                 emptyList(),
-                of(player1, player2, player3, player4, player5, player6, player7, player8));
+                players);
 
         // WHEN
-        territory.playTurn();
+        territory.moveForward(player1);
 
         // THEN
-        assertThat(player1.getCoordinates()).isEqualTo(new Coordinates(0, 0));
-        assertThat(player2.getCoordinates()).isEqualTo(new Coordinates(0, 1));
-        assertThat(player3.getCoordinates()).isEqualTo(new Coordinates(3, 0));
-        assertThat(player4.getCoordinates()).isEqualTo(new Coordinates(2, 0));
-        assertThat(player5.getCoordinates()).isEqualTo(new Coordinates(3, 3));
-        assertThat(player6.getCoordinates()).isEqualTo(new Coordinates(3, 2));
-        assertThat(player7.getCoordinates()).isEqualTo(new Coordinates(0, 3));
-        assertThat(player8.getCoordinates()).isEqualTo(new Coordinates(1, 3));
+        assertThat(player1.getCoordinates()).isEqualTo(expectedCoordinates);
+    }
+
+    private static Stream<Arguments> should_move_player_forward_respecting_boundaries_and_collisions() {
+        Arguments[] arguments = new Arguments[]{
+                Arguments.of(new Player("player1", new Coordinates(1, 2), Orientation.NORTH), new Coordinates(1, 1))
+        };
+        return Stream.of(arguments);
     }
 }

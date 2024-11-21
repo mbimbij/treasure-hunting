@@ -55,7 +55,7 @@ public class Territory {
         validateTerritorySize();
         validateNoOverlappingFeatures();
         validateNoFeatureOutOfBound();
-        validateNoDuplicateAlayerName();
+        validateNoDuplicatePlayerName();
     }
 
     private void validateNoFeatureOutOfBound() {
@@ -111,7 +111,7 @@ public class Territory {
         }
     }
 
-    private void validateNoDuplicateAlayerName() {
+    private void validateNoDuplicatePlayerName() {
         Map<String, Long> playersCountByName = this.players.stream()
                 .collect(groupingBy(Player::getName, counting()));
 
@@ -135,5 +135,9 @@ public class Territory {
         allFeaturesCoordinates.addAll(mountainsCoordinates);
         allFeaturesCoordinates.addAll(playersCoordinates);
         return allFeaturesCoordinates;
+    }
+
+    void moveForward(Player player) {
+        player.moveForward();
     }
 }
