@@ -42,10 +42,14 @@ public class Territory {
         validate();
     }
 
+    public void playTurn() {
+
+    }
+
     /**
      * As the validation logic grows, it might be appropriate to put it in either a factory or a Validator. Especially
      * considering the possibility of validating min and max values for width, height, number of mountains, treasures,
-     * players. Or considering even more complex validation logic and procedural generation.
+     * players. Or considering even more complex validation logic and creation logic, like procedural generation.
      */
     private void validate() {
         validateTerritorySize();
@@ -59,13 +63,20 @@ public class Territory {
         Map<Coordinates, Long> outOfBoundFeatureCoordinates = allFeaturesCoordinates.stream()
                 .filter(this::areCoordinatesOutOfBound)
                 .collect(groupingBy(identity(), counting()));
-        if(!outOfBoundFeatureCoordinates.isEmpty()){
+        if (!outOfBoundFeatureCoordinates.isEmpty()) {
             String message = FEATURES_COORDINATES_OUT_OF_BOUND_ERROR_MESSAGE
                     .formatted(outOfBoundFeatureCoordinates.keySet());
             throw new IllegalArgumentException(message);
         }
     }
 
+    /**
+     * Decided on moving that method back to Territory class as otherwise it felt like the logic of the territory was
+     * leaking into the Coordinates class.
+     *
+     * @param coordinates
+     * @return
+     */
     private boolean areCoordinatesOutOfBound(Coordinates coordinates) {
         return coordinates.westEast() < 0
                || coordinates.westEast() >= width
@@ -124,9 +135,5 @@ public class Territory {
         allFeaturesCoordinates.addAll(mountainsCoordinates);
         allFeaturesCoordinates.addAll(playersCoordinates);
         return allFeaturesCoordinates;
-    }
-
-    public void playTurn() {
-
     }
 }

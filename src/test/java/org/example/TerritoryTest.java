@@ -336,7 +336,7 @@ class TerritoryTest {
     }
 
     @Test
-    void should_move_player_forward_correctly() {
+    void should_move_player_forward_respecting_boundaries_and_collisions() {
         // GIVEN
         int width = 4;
         int height = 4;
