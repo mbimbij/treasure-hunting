@@ -61,7 +61,7 @@ public class Territory {
     private void validateNoFeatureOutOfBound() {
         List<Coordinates> allFeaturesCoordinates = getAllFeaturesCoordinates();
         Map<Coordinates, Long> outOfBoundFeatureCoordinates = allFeaturesCoordinates.stream()
-                .filter(this::areCoordinatesOutOfBound)
+                .filter(this::isOutOfBound)
                 .collect(groupingBy(identity(), counting()));
         if (!outOfBoundFeatureCoordinates.isEmpty()) {
             String message = FEATURES_COORDINATES_OUT_OF_BOUND_ERROR_MESSAGE
@@ -77,7 +77,7 @@ public class Territory {
      * @param coordinates
      * @return
      */
-    private boolean areCoordinatesOutOfBound(Coordinates coordinates) {
+    private boolean isOutOfBound(Coordinates coordinates) {
         return coordinates.westEast() < 0
                || coordinates.westEast() >= width
                || coordinates.northSouth() < 0
@@ -138,6 +138,9 @@ public class Territory {
     }
 
     void moveForward(Player player) {
-        player.moveForward();
+        if(!this.isOutOfBound(player.getFuturePosition())) {
+            player.moveForward();
+        }
     }
+
 }

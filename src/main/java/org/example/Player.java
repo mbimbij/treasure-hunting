@@ -47,4 +47,14 @@ public class Player {
             case WEST -> coordinates = coordinates.westOf();
         }
     }
+
+
+    Coordinates getFuturePosition() {
+        return switch (getOrientation()) {
+            case NORTH -> coordinates.northOf();
+            case EAST -> coordinates.eastOf();
+            case SOUTH -> coordinates.southOf();
+            case WEST -> coordinates.westOf();
+        };
+    }
 }
