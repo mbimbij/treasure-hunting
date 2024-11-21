@@ -23,11 +23,11 @@ class TreasureHuntingApplicationShould {
     private static final Treasure TREASURE_AT_1_1 = new Treasure(COORDINATES_1_1, 3);
     private static final Mountain MOUNTAIN_AT_1_1 = new Mountain(COORDINATES_1_1);
     private static final Coordinates COORDINATES_1_2 = new Coordinates(1, 2);
-    private static final Adventurer ADVENTURER_1 = new Adventurer("Adventurer #1",
+    private static final Player PLAYER_1 = new Player("Player #1",
             COORDINATES_1_1,
             Orientation.NORTH,
             0);
-    private static final Adventurer ADVENTURER_2 = new Adventurer("Adventurer #2",
+    private static final Player PLAYER_2 = new Player("Player #2",
             COORDINATES_1_2,
             Orientation.NORTH,
             0);
@@ -94,11 +94,11 @@ class TreasureHuntingApplicationShould {
     }
 
     @Test
-    void create_territory_with_adventurers() {
+    void create_territory_with_players() {
         // GIVEN
-        List<Adventurer> adventurers = of(
-                ADVENTURER_1,
-                ADVENTURER_2
+        List<Player> players = of(
+                PLAYER_1,
+                PLAYER_2
         );
 
         // WHEN
@@ -106,12 +106,12 @@ class TreasureHuntingApplicationShould {
                 4,
                 emptyList(),
                 emptyList(),
-                adventurers);
+                players);
 
         // THEN
-        assertThat(madreDeDios.getAdventurers())
+        assertThat(madreDeDios.getPlayers())
                 .usingRecursiveFieldByFieldElementComparator()
-                .isEqualTo(adventurers);
+                .isEqualTo(players);
     }
 
     @Property
@@ -153,9 +153,9 @@ class TreasureHuntingApplicationShould {
     @Nested
     class NonPBTErrorCases {
 
-        private static final List<Adventurer> OVERLAPPING_ADVENTURERS = of(
-                ADVENTURER_1,
-                ADVENTURER_2.withCoordinates(ADVENTURER_1.getCoordinates())
+        private static final List<Player> OVERLAPPING_ADVENTURERS = of(
+                PLAYER_1,
+                PLAYER_2.withCoordinates(PLAYER_1.getCoordinates())
         );
         private static final List<Mountain> OVERLAPPING_MOUNTAINS = of(
                 MOUNTAIN_AT_1_1,
@@ -178,19 +178,19 @@ class TreasureHuntingApplicationShould {
          *
          * @param mountains
          * @param treasures
-         * @param adventurers
+         * @param players
          */
         @ParameterizedTest
         @MethodSource
         void throw_exception_if_overlapping_features(List<Mountain> mountains,
                                                      List<Treasure> treasures,
-                                                     List<Adventurer> adventurers) {
+                                                     List<Player> players) {
             // WHEN
             ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(3,
                     4,
                     mountains,
                     treasures,
-                    adventurers);
+                    players);
 
             // THEN
             assertThatThrownBy(throwingCallable)
@@ -199,11 +199,11 @@ class TreasureHuntingApplicationShould {
         }
 
         @Test
-        void throw_exception_if_2_adventurers_have_same_name() {
+        void throw_exception_if_2_players_have_same_name() {
             // GIVEN
-            List<Adventurer> adventurers = of(
-                    ADVENTURER_1,
-                    ADVENTURER_2.withName(ADVENTURER_1.getName())
+            List<Player> players = of(
+                    PLAYER_1,
+                    PLAYER_2.withName(PLAYER_1.getName())
             );
 
             // WHEN
@@ -211,12 +211,12 @@ class TreasureHuntingApplicationShould {
                     4,
                     emptyList(),
                     emptyList(),
-                    adventurers);
+                    players);
 
             // THEN
             assertThatThrownBy(throwingCallable)
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("Cannot build territory because of duplicate adventurers names: [%s]".formatted(ADVENTURER_1.getName()));
+                    .hasMessage("Cannot build territory because of duplicate players names: [%s]".formatted(PLAYER_1.getName()));
         }
 
         private static Stream<Arguments> throw_exception_if_overlapping_features() {
@@ -225,9 +225,9 @@ class TreasureHuntingApplicationShould {
                     Arguments.of(emptyList(), OVERLAPPING_TREASURES, emptyList()),
                     Arguments.of(emptyList(), emptyList(), OVERLAPPING_ADVENTURERS),
                     Arguments.of(of(MOUNTAIN_AT_1_1), of(TREASURE_AT_1_1), emptyList()),
-                    Arguments.of(of(MOUNTAIN_AT_1_1), emptyList(), of(ADVENTURER_1)),
-                    Arguments.of(emptyList(), of(TREASURE_AT_1_1), of(ADVENTURER_1)),
-                    Arguments.of(of(MOUNTAIN_AT_1_1), of(TREASURE_AT_1_1), of(ADVENTURER_1))
+                    Arguments.of(of(MOUNTAIN_AT_1_1), emptyList(), of(PLAYER_1)),
+                    Arguments.of(emptyList(), of(TREASURE_AT_1_1), of(PLAYER_1)),
+                    Arguments.of(of(MOUNTAIN_AT_1_1), of(TREASURE_AT_1_1), of(PLAYER_1))
             );
         }
     }

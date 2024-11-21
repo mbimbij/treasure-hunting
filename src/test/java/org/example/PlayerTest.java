@@ -4,18 +4,18 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class AdventurerTest {
+class PlayerTest {
     @Test
     void equalityTest() {
-        Adventurer adventurer1 = new Adventurer("adventurer1",
+        Player adventurer1 = new Player("adventurer1",
                 new Coordinates(0, 1),
                 Orientation.NORTH,
                 0);
-        Adventurer adventurer1Bis = new Adventurer("adventurer1",
+        Player adventurer1Bis = new Player("adventurer1",
                 new Coordinates(1, 2),
                 Orientation.NORTH,
                 0);
-        Adventurer adventurer2 = new Adventurer("adventurer2",
+        Player adventurer2 = new Player("adventurer2",
                 new Coordinates(1, 2),
                 Orientation.NORTH,
                 0);

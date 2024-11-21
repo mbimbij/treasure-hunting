@@ -4,7 +4,6 @@ import com.speedment.common.mapstream.MapStream;
 import lombok.Getter;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.function.Function.identity;
@@ -20,21 +19,21 @@ public class Territory {
     private final int height;
     private final List<Mountain> mountains;
     private final List<Treasure> treasures;
-    private final List<Adventurer> adventurers;
+    private final List<Player> players;
 
-    public Territory(int width, int height, List<Mountain> mountains, List<Treasure> treasures, List<Adventurer> adventurers) {
+    public Territory(int width, int height, List<Mountain> mountains, List<Treasure> treasures, List<Player> players) {
         this.width = width;
         this.height = height;
         this.mountains = mountains;
         this.treasures = treasures;
-        this.adventurers = adventurers;
+        this.players = players;
         validate();
     }
 
     private void validate() {
         validateTerritorySize();
         validateNoOverlappingFeatures();
-        validateNoDuplicateAdventurerName();
+        validateNoDuplicateAlayerName();
     }
 
     private void validateTerritorySize() {
@@ -45,7 +44,7 @@ public class Territory {
     }
 
     /**
-     * TODO validate with PO: an adventurer cannot have its initial coordinates equal to one of the treasure.
+     * TODO validate with PO: an player cannot have its initial coordinates equal to one of the treasure.
      */
     private void validateNoOverlappingFeatures() {
         List<Coordinates> allFeaturesCoordinates = getAllFeaturesCoordinates();
@@ -64,17 +63,17 @@ public class Territory {
         }
     }
 
-    private void validateNoDuplicateAdventurerName() {
-        Map<String, Long> adventurersCountByName = this.adventurers.stream()
-                .collect(Collectors.groupingBy(Adventurer::getName, Collectors.counting()));
+    private void validateNoDuplicateAlayerName() {
+        Map<String, Long> playersCountByName = this.players.stream()
+                .collect(Collectors.groupingBy(Player::getName, Collectors.counting()));
 
-        Map<String, Long> duplicateAdventurersNames = MapStream.of(adventurersCountByName)
+        Map<String, Long> duplicateAlayersNames = MapStream.of(playersCountByName)
                 .filterValue(count -> count > 1)
                 .toMap();
 
-        if(!duplicateAdventurersNames.isEmpty()){
-            String duplicateAdventurersNamesString = duplicateAdventurersNames.keySet().toString();
-            String message = "Cannot build territory because of duplicate adventurers names: %s".formatted(duplicateAdventurersNamesString);
+        if(!duplicateAlayersNames.isEmpty()){
+            String duplicateAlayersNamesString = duplicateAlayersNames.keySet().toString();
+            String message = "Cannot build territory because of duplicate players names: %s".formatted(duplicateAlayersNamesString);
             throw new IllegalArgumentException(message);
         }
     }
@@ -82,11 +81,11 @@ public class Territory {
     private List<Coordinates> getAllFeaturesCoordinates() {
         List<Coordinates> treasuresCoordinates = this.treasures.stream().map(Treasure::coordinates).toList();
         List<Coordinates> mountainsCoordinates = this.mountains.stream().map(Mountain::coordinates).toList();
-        List<Coordinates> adventurersCoordinates = this.getAdventurers().stream().map(Adventurer::getCoordinates).toList();
+        List<Coordinates> playersCoordinates = this.getPlayers().stream().map(Player::getCoordinates).toList();
         List<Coordinates> allFeaturesCoordinates = new ArrayList<>();
         allFeaturesCoordinates.addAll(treasuresCoordinates);
         allFeaturesCoordinates.addAll(mountainsCoordinates);
-        allFeaturesCoordinates.addAll(adventurersCoordinates);
+        allFeaturesCoordinates.addAll(playersCoordinates);
         return allFeaturesCoordinates;
     }
 

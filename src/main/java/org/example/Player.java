@@ -21,14 +21,14 @@ import lombok.With;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @With
 @ToString(includeFieldNames = false)
-public class Adventurer {
+public class Player {
     @EqualsAndHashCode.Include
     private final String name;
     private final Coordinates coordinates;
     private final Orientation orientation;
     private final int treasuresCount;
 
-    public Adventurer(String name, Coordinates coordinates, Orientation orientation, int treasuresCount) {
+    public Player(String name, Coordinates coordinates, Orientation orientation, int treasuresCount) {
         this.orientation = orientation;
         this.name = name;
         this.coordinates = coordinates;
