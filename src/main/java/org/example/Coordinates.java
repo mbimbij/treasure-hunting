@@ -9,10 +9,19 @@ public record Coordinates(int westEast, int northSouth) {
         return "(%d, %d)".formatted(westEast, northSouth);
     }
 
-    boolean isOutOfBound(int width, int height) {
-        return westEast() < 0
-               || westEast() >= width
-               || northSouth() < 0
-               || northSouth() >= height;
+    public Coordinates northOf() {
+        return this.withNorthSouth(northSouth - 1);
+    }
+
+    public Coordinates southOf() {
+        return this.withNorthSouth(northSouth + 1);
+    }
+
+    public Coordinates eastOf() {
+        return this.withWestEast(westEast + 1);
+    }
+
+    public Coordinates westOf() {
+        return this.withWestEast(westEast - 1);
     }
 }

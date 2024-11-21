@@ -57,13 +57,20 @@ public class Territory {
     private void validateNoFeatureOutOfBound() {
         List<Coordinates> allFeaturesCoordinates = getAllFeaturesCoordinates();
         Map<Coordinates, Long> outOfBoundFeatureCoordinates = allFeaturesCoordinates.stream()
-                .filter(coordinates -> coordinates.isOutOfBound(width, height))
+                .filter(this::areCoordinatesOutOfBound)
                 .collect(groupingBy(identity(), counting()));
         if(!outOfBoundFeatureCoordinates.isEmpty()){
             String message = FEATURES_COORDINATES_OUT_OF_BOUND_ERROR_MESSAGE
                     .formatted(outOfBoundFeatureCoordinates.keySet());
             throw new IllegalArgumentException(message);
         }
+    }
+
+    private boolean areCoordinatesOutOfBound(Coordinates coordinates) {
+        return coordinates.westEast() < 0
+               || coordinates.westEast() >= width
+               || coordinates.northSouth() < 0
+               || coordinates.northSouth() >= height;
     }
 
     private void validateTerritorySize() {
