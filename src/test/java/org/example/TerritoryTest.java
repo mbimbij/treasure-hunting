@@ -341,13 +341,32 @@ class TerritoryTest {
     record IntegerPair(Integer first, Integer second) {
     }
 
+    /**
+     * Uses a map similar to the one described in the instructions
+     * <br/>
+     * <table border="1">
+     * <tr><td>.</td><td>M</td><td>.</td></tr>
+     * <tr><td>.</td><td>.</td><td>M</td></tr>
+     * <tr><td>.</td><td>M</td><td>A(P2)</td></tr>
+     * <tr><td>T(2)</td><td>T(3)</td><td>.</td></tr>
+     * </table>
+     * <br/>
+     * Or, in non formatted javadoc:
+     * .     M     .
+     * .     .     M
+     * .     M     A(P2)
+     * T(2)  T(3)  .
+     *
+     * @param player1
+     * @param expectedCoordinates
+     */
     @ParameterizedTest
     @MethodSource
     void should_move_player_forward_respecting_boundaries_and_collisions(Player player1, Coordinates expectedCoordinates) {
         // GIVEN
         int width = 3;
         int height = 4;
-        Player player2 = new Player("player2", new Coordinates(2, 2), NORTH);
+        Player player2 = new Player("p2", new Coordinates(2, 2), NORTH);
         List<Player> players = of(player1, player2);
         Territory territory = new Territory(width,
                 height,
