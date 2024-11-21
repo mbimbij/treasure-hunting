@@ -9,9 +9,12 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static java.util.List.of;
 import static net.jqwik.api.Arbitraries.integers;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -164,6 +167,105 @@ class TerritoryTest {
                 .hasMessage(expectedErrorMessage);
     }
 
+    /**
+     * Uses a map similar to the one described in the instructions <br/>
+     * <table border="1">
+     * <tr><td>.</td><td>M</td><td>.</td></tr>
+     * <tr><td>.</td><td>.</td><td>M</td></tr>
+     * <tr><td>.</td><td>M</td><td>A(P2)</td></tr>
+     * <tr><td>T(2)</td><td>T(3)</td><td>.</td></tr>
+     * </table>
+     * <br/>
+     * Or, in non formatted javadoc:
+     * .     M     .
+     * .     .     M
+     * .     M     A(P2)
+     * T(2)  T(3)  .
+     *
+     * @param player1
+     * @param expectedCoordinates
+     */
+    @ParameterizedTest
+    @MethodSource
+    void should_move_player_forward_respecting_boundaries_and_collisions(Player player1, Coordinates expectedCoordinates) {
+        // GIVEN
+        int width = 3;
+        int height = 4;
+        Player player2 = new Player("p2", new Coordinates(2, 2), NORTH);
+        List<Player> players = of(player1, player2);
+        Territory territory = new Territory(width,
+                height,
+                of(new Mountain(1, 0),
+                        new Mountain(2, 1),
+                        new Mountain(1, 2)
+                ),
+                of(
+                        new Treasure(0, 3, 2),
+                        new Treasure(1, 3, 3)
+                ),
+                players);
+
+        // WHEN
+        territory.moveForward(player1);
+
+        // THEN
+        assertThat(player1.getCoordinates()).isEqualTo(expectedCoordinates);
+    }
+
+    @Test
+    void collect_treasure_iff_moving_on_it_and_non_empty() {
+        // GIVEN
+        int width = 4;
+        int height = 1;
+        Player player = new Player("player", new Coordinates(0, 0), EAST);
+        Territory territory = new Territory(width,
+                height,
+                emptyList(),
+                of(
+                        new Treasure(1, 0, 3),
+                        new Treasure(2, 0, 0),
+                        new Treasure(3, 0, 7)
+                ),
+                of(player));
+
+        // WHEN
+        territory.moveForward(player);
+        territory.moveForward(player);
+        territory.moveForward(player);
+        territory.turnRight(player);
+        territory.turnRight(player);
+        territory.moveForward(player);
+        territory.moveForward(player);
+        territory.moveForward(player);
+
+        // THEN
+        assertThat(player.getCollectedTreasuresCount()).isEqualTo(3);
+        assertThat(territory.getTreasures()).extracting(Treasure::quantity).isEqualTo(of(1, 0, 6));
+    }
+
+
+    private static Stream<Arguments> should_move_player_forward_respecting_boundaries_and_collisions() {
+        Player facingNoObstacle = new Player("player1", new Coordinates(0, 1), NORTH);
+        Player facingNorthernLimit = new Player("player1", new Coordinates(0, 0), NORTH);
+        Player facingEasternLimit = new Player("player1", new Coordinates(2, 3), EAST);
+        Player facingSouthernLimit = new Player("player1", new Coordinates(2, 3), SOUTH);
+        Player facingWesternLimit = new Player("player1", new Coordinates(0, 2), WEST);
+        Player facingMountain = new Player("player", new Coordinates(1, 1), NORTH);
+        Player facingOtherPlayer = new Player("player", new Coordinates(2, 3), NORTH);
+        Player facingTreasure = new Player("player", new Coordinates(2, 3), WEST);
+        Arguments[] arguments = new Arguments[]{
+                Arguments.of(facingNoObstacle, new Coordinates(0, 0)),
+                Arguments.of(facingNorthernLimit, new Coordinates(0, 0)),
+                Arguments.of(facingEasternLimit, new Coordinates(2, 3)),
+                Arguments.of(facingSouthernLimit, new Coordinates(2, 3)),
+                Arguments.of(facingWesternLimit, new Coordinates(0, 2)),
+                Arguments.of(facingMountain, new Coordinates(1, 1)),
+                Arguments.of(facingOtherPlayer, new Coordinates(2, 3)),
+                Arguments.of(facingTreasure, new Coordinates(1, 3))
+        };
+        return Stream.of(arguments);
+    }
+
     private static Stream<Arguments> throw_exception_if_multiple_players_have_the_same_name() {
         Arguments oneDuplicate = Arguments.of(of(PLAYER_1, PLAYER_1.withCoordinates(COORDINATES_1_2)), of(PLAYER_1.getName()));
         Arguments twoDuplicates = Arguments.of(of(
@@ -213,6 +315,7 @@ class TerritoryTest {
                 MOUNTAIN_AT_1_1,
                 new Mountain(COORDINATES_1_2)
         );
+
         private static final List<Treasure> OVERLAPPING_TREASURES = of(
                 TREASURE_AT_1_1,
                 new Treasure(COORDINATES_1_1, 2),
@@ -265,12 +368,14 @@ class TerritoryTest {
                     Arguments.of(of(MOUNTAIN_AT_1_1), of(TREASURE_AT_1_1), of(PLAYER_1))
             );
         }
+
     }
 
     @Nested
     class OutOfBoundFeatures {
 
         private static final int width = 3;
+
         private static final int height = 4;
 
         @ParameterizedTest
@@ -336,55 +441,11 @@ class TerritoryTest {
         private static Coordinates tooMuchWest() {
             return new Coordinates(-1, 2);
         }
+
     }
 
     record IntegerPair(Integer first, Integer second) {
-    }
 
-    @ParameterizedTest
-    @MethodSource
-    void should_move_player_forward_respecting_boundaries_and_collisions(Player player1, Coordinates expectedCoordinates) {
-        // GIVEN
-        int width = 3;
-        int height = 4;
-        Player player2 = new Player("player2", new Coordinates(2, 2), NORTH);
-        List<Player> players = of(player1, player2);
-        Territory territory = new Territory(width,
-                height,
-                of(new Mountain(1, 0),
-                        new Mountain(2, 1),
-                        new Mountain(1, 2)
-                ),
-                of(
-                        new Treasure(0, 3, 2),
-                        new Treasure(1, 3, 3)
-                ),
-                players);
 
-        // WHEN
-        territory.moveForward(player1);
-
-        // THEN
-        assertThat(player1.getCoordinates()).isEqualTo(expectedCoordinates);
-    }
-
-    private static Stream<Arguments> should_move_player_forward_respecting_boundaries_and_collisions() {
-        Player facingNoObstacle = new Player("player1", new Coordinates(0, 1), NORTH);
-        Player facingNorthernLimit = new Player("player1", new Coordinates(0, 0), NORTH);
-        Player facingEasternLimit = new Player("player1", new Coordinates(2, 3), EAST);
-        Player facingSouthernLimit = new Player("player1", new Coordinates(2, 3), SOUTH);
-        Player facingWesternLimit = new Player("player1", new Coordinates(0, 2), WEST);
-        Player facingMountain = new Player("player", new Coordinates(1, 1), NORTH);
-        Player facingOtherPlayer = new Player("player", new Coordinates(2, 3), NORTH);
-        Arguments[] arguments = new Arguments[]{
-                Arguments.of(facingNoObstacle, new Coordinates(0, 0)),
-                Arguments.of(facingNorthernLimit, new Coordinates(0, 0)),
-                Arguments.of(facingEasternLimit, new Coordinates(2, 3)),
-                Arguments.of(facingSouthernLimit, new Coordinates(2, 3)),
-                Arguments.of(facingWesternLimit, new Coordinates(0, 2)),
-                Arguments.of(facingMountain, new Coordinates(1, 1)),
-                Arguments.of(facingOtherPlayer, new Coordinates(2, 3))
-        };
-        return Stream.of(arguments);
     }
 }
