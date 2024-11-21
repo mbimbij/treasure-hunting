@@ -2,6 +2,7 @@ package org.example;
 
 import net.jqwik.api.*;
 import org.assertj.core.api.ThrowableAssert;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -48,25 +49,6 @@ class TreasureHuntingApplicationShould {
         // THEN
         assertThat(madreDeDios.getWidth()).isEqualTo(width);
         assertThat(madreDeDios.getHeight()).isEqualTo(height);
-    }
-
-    @Property
-    void throw_exception_for_invalid_width_or_height(@ForAll("invalidPairsOfWidthAndHeight") IntegerPair pair) {
-        // GIVEN
-        Integer width = pair.first();
-        Integer height = pair.second();
-
-        // WHEN
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(width,
-                height,
-                emptyList(),
-                emptyList(),
-                emptyList());
-
-        // THEN
-        assertThatThrownBy(throwingCallable)
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageStartingWith("Width and height must be greater than zero but were");
     }
 
     @Test
@@ -132,82 +114,97 @@ class TreasureHuntingApplicationShould {
                 .isEqualTo(adventurers);
     }
 
-    private static Stream<Arguments> throw_exception_if_overlapping_features() {
-        return Stream.of(
-                Arguments.of(overlappingMountains(), emptyList(), emptyList()),
-                Arguments.of(emptyList(), overlappingTreasures(), emptyList()),
-                Arguments.of(emptyList(), emptyList(), overlappingAdventurers()),
-                Arguments.of(of(MOUNTAIN_AT_1_1), of(TREASURE_AT_1_1), emptyList()),
-                Arguments.of(of(MOUNTAIN_AT_1_1), emptyList(), of (ADVENTURER_1)),
-                Arguments.of(emptyList(), of(TREASURE_AT_1_1), of (ADVENTURER_1)),
-                Arguments.of(of(MOUNTAIN_AT_1_1), of(TREASURE_AT_1_1), of (ADVENTURER_1))
-        );
-    }
+    @Nested
+    class ErrorCases {
 
-    private static List<Adventurer> overlappingAdventurers() {
-        return of(
+        private static final List<Adventurer> OVERLAPPING_ADVENTURERS = of(
                 ADVENTURER_1,
                 ADVENTURER_2.withCoordinates(ADVENTURER_1.getCoordinates())
         );
-    }
-
-    private static List<Mountain> overlappingMountains() {
-        return of(
+        private static final List<Mountain> OVERLAPPING_MOUNTAINS = of(
                 MOUNTAIN_AT_1_1,
                 MOUNTAIN_AT_1_1,
                 new Mountain(COORDINATES_1_2)
         );
-    }
-
-    private static List<Treasure> overlappingTreasures() {
-        return of(
+        private static final List<Treasure> OVERLAPPING_TREASURES = of(
                 TREASURE_AT_1_1,
                 new Treasure(COORDINATES_1_1, 2),
                 new Treasure(COORDINATES_1_2, 2)
         );
-    }
 
-    /**
-     * TODO validate with PO: overlapping mountains are probably an error, and we would rather fail
-     * fast than producing silent erroneous results. The PO might want the overlapping moutains to be ignored and
-     * considered as one.
-     * TODO validate with PO: overlapping treasure are considered as errors, and we would rather
-     * fail fast. The PO might have another opinion on the matter, like adding the treasure or ignoring all except the
-     * first or last one.
-     *
-     * @param mountains
-     * @param treasures
-     * @param adventurers
-     */
-    @ParameterizedTest
-    @MethodSource
-    void throw_exception_if_overlapping_features(List<Mountain> mountains,
-                                                 List<Treasure> treasures,
-                                                 List<Adventurer> adventurers) {
-        // WHEN
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(3,
-                4,
-                mountains,
-                treasures,
-                adventurers);
+        /**
+         * TODO validate with PO: overlapping mountains are probably an error, and we would rather fail
+         * fast than producing silent erroneous results. The PO might want the overlapping mountains to be ignored and
+         * considered as one.
+         * TODO validate with PO: overlapping treasure are considered as errors, and we would rather
+         * fail fast. The PO might have another opinion on the matter, like adding the treasure or ignoring all except the
+         * first or last one.
+         *
+         * @param mountains
+         * @param treasures
+         * @param adventurers
+         */
+        @ParameterizedTest
+        @MethodSource
+        void throw_exception_if_overlapping_features(List<Mountain> mountains,
+                                                     List<Treasure> treasures,
+                                                     List<Adventurer> adventurers) {
+            // WHEN
+            ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(3,
+                    4,
+                    mountains,
+                    treasures,
+                    adventurers);
 
-        // THEN
-        assertThatThrownBy(throwingCallable)
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageStartingWith("Cannot build territory because of overlapping features at");
+            // THEN
+            assertThatThrownBy(throwingCallable)
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageStartingWith("Cannot build territory because of overlapping features at");
+        }
+
+        @Property
+        void throw_exception_for_invalid_width_or_height(@ForAll("invalidPairsOfWidthAndHeight") IntegerPair pair) {
+            // GIVEN
+            Integer width = pair.first();
+            Integer height = pair.second();
+
+            // WHEN
+            ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(width,
+                    height,
+                    emptyList(),
+                    emptyList(),
+                    emptyList());
+
+            // THEN
+            assertThatThrownBy(throwingCallable)
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageStartingWith("Width and height must be greater than zero but were");
+        }
+
+        private static Stream<Arguments> throw_exception_if_overlapping_features() {
+            return Stream.of(
+                    Arguments.of(OVERLAPPING_MOUNTAINS, emptyList(), emptyList()),
+                    Arguments.of(emptyList(), OVERLAPPING_TREASURES, emptyList()),
+                    Arguments.of(emptyList(), emptyList(), OVERLAPPING_ADVENTURERS),
+                    Arguments.of(of(MOUNTAIN_AT_1_1), of(TREASURE_AT_1_1), emptyList()),
+                    Arguments.of(of(MOUNTAIN_AT_1_1), emptyList(), of (ADVENTURER_1)),
+                    Arguments.of(emptyList(), of(TREASURE_AT_1_1), of (ADVENTURER_1)),
+                    Arguments.of(of(MOUNTAIN_AT_1_1), of(TREASURE_AT_1_1), of (ADVENTURER_1))
+            );
+        }
+
+        @Provide
+        private Arbitrary<IntegerPair> invalidPairsOfWidthAndHeight() {
+            return Combinators.combine(integers(), integers())
+                    .filter((integer, integer2) -> integer <= 0 || integer2 <= 0)
+                    .as(IntegerPair::new);
+        }
     }
 
     @Provide
     Arbitrary<IntegerPair> validPairsOfWidthAndHeight() {
         return Combinators.combine(integers(), integers())
                 .filter((integer, integer2) -> integer > 0 && integer2 > 0)
-                .as(IntegerPair::new);
-    }
-
-    @Provide
-    Arbitrary<IntegerPair> invalidPairsOfWidthAndHeight() {
-        return Combinators.combine(integers(), integers())
-                .filter((integer, integer2) -> integer <= 0 || integer2 <= 0)
                 .as(IntegerPair::new);
     }
 
