@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
+import static net.jqwik.api.Arbitraries.integers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -177,16 +178,14 @@ class TreasureHuntingApplicationShould {
 
     @Provide
     Arbitrary<IntegerPair> validPairsOfWidthAndHeight() {
-        IntegerArbitrary integers = Arbitraries.integers().between(-100, 100);
-        return Combinators.combine(integers, integers)
+        return Combinators.combine(integers(), integers())
                 .filter((integer, integer2) -> integer > 0 && integer2 > 0)
                 .as(IntegerPair::new);
     }
 
     @Provide
     Arbitrary<IntegerPair> invalidPairsOfWidthAndHeight() {
-        IntegerArbitrary integers = Arbitraries.integers().between(-100, 100);
-        return Combinators.combine(integers, integers)
+        return Combinators.combine(integers(), integers())
                 .filter((integer, integer2) -> integer <= 0 || integer2 <= 0)
                 .as(IntegerPair::new);
     }
