@@ -16,9 +16,9 @@ import static java.util.List.of;
 import static net.jqwik.api.Arbitraries.integers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.*;
 
-class TreasureHuntingApplicationShould {
-
+class TerritoryShould {
     private static final Coordinates COORDINATES_1_1 = new Coordinates(1, 1);
     private static final Coordinates COORDINATES_1_2 = new Coordinates(1, 2);
     private static final Coordinates COORDINATES_1_3 = new Coordinates(1, 3);
