@@ -395,6 +395,7 @@ class TerritoryTest {
         Player facingWesternLimit = new Player("player1", new Coordinates(0, 2), WEST);
         Player facingMountain = new Player("player", new Coordinates(1, 1), NORTH);
         Player facingOtherPlayer = new Player("player", new Coordinates(2, 3), NORTH);
+        Player facingTreasure = new Player("player", new Coordinates(2, 3), WEST);
         Arguments[] arguments = new Arguments[]{
                 Arguments.of(facingNoObstacle, new Coordinates(0, 0)),
                 Arguments.of(facingNorthernLimit, new Coordinates(0, 0)),
@@ -402,7 +403,8 @@ class TerritoryTest {
                 Arguments.of(facingSouthernLimit, new Coordinates(2, 3)),
                 Arguments.of(facingWesternLimit, new Coordinates(0, 2)),
                 Arguments.of(facingMountain, new Coordinates(1, 1)),
-                Arguments.of(facingOtherPlayer, new Coordinates(2, 3))
+                Arguments.of(facingOtherPlayer, new Coordinates(2, 3)),
+                Arguments.of(facingTreasure, new Coordinates(1, 3))
         };
         return Stream.of(arguments);
     }
