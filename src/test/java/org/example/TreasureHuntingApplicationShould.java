@@ -152,7 +152,7 @@ class TreasureHuntingApplicationShould {
      * Because JQwik tests are not executed in non-static inner classes, but junit @Nested test classes must be non-static
      */
     @Nested
-    class NonPBTErrorCases {
+    class OverlappingFeatures {
 
         private static final List<Player> OVERLAPPING_ADVENTURERS = of(
                 PLAYER_1,
