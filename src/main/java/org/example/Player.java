@@ -25,7 +25,7 @@ import static org.example.Orientation.NORTH;
 @With
 @ToString(includeFieldNames = false)
 @AllArgsConstructor
-public class Player {
+public class Player implements CanCollideWith {
     @EqualsAndHashCode.Include
     private final String name;
     private Coordinates coordinates;
@@ -56,5 +56,10 @@ public class Player {
             case SOUTH -> coordinates.southOf();
             case WEST -> coordinates.westOf();
         };
+    }
+
+    @Override
+    public boolean collidesWith(Coordinates otherCoordinates) {
+        return this.coordinates.equals(otherCoordinates);
     }
 }

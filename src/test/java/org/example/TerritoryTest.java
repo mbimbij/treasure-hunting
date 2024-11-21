@@ -63,7 +63,7 @@ class TerritoryTest {
     void create_territory_with_mountains() {
         // GIVEN
         List<Mountain> mountains = of(
-                new Mountain(0,0),
+                new Mountain(0, 0),
                 MOUNTAIN_AT_1_1,
                 new Mountain(COORDINATES_1_2)
         );
@@ -351,8 +351,14 @@ class TerritoryTest {
         List<Player> players = of(player1, player2);
         Territory territory = new Territory(width,
                 height,
-                of(new Mountain(1, 1)),
-                emptyList(),
+                of(new Mountain(1, 0),
+                        new Mountain(2, 1),
+                        new Mountain(1, 2)
+                ),
+                of(
+                        new Treasure(0, 3, 2),
+                        new Treasure(1, 3, 3)
+                ),
                 players);
 
         // WHEN
@@ -363,18 +369,21 @@ class TerritoryTest {
     }
 
     private static Stream<Arguments> should_move_player_forward_respecting_boundaries_and_collisions() {
-        Player facingNoObstacle = new Player("player1", new Coordinates(1, 2), NORTH);
-        Player facingNorthernLimit = new Player("player1", new Coordinates(1, 0), NORTH);
+        Player facingNoObstacle = new Player("player1", new Coordinates(0, 1), NORTH);
+        Player facingNorthernLimit = new Player("player1", new Coordinates(0, 0), NORTH);
         Player facingEasternLimit = new Player("player1", new Coordinates(2, 3), EAST);
-        Player facingSouthernLimit = new Player("player1", new Coordinates(1, 3), SOUTH);
+        Player facingSouthernLimit = new Player("player1", new Coordinates(2, 3), SOUTH);
         Player facingWesternLimit = new Player("player1", new Coordinates(0, 2), WEST);
         Player facingMountain = new Player("player", new Coordinates(1, 1), NORTH);
+        Player facingOtherPlayer = new Player("player", new Coordinates(2, 3), NORTH);
         Arguments[] arguments = new Arguments[]{
-                Arguments.of(facingNoObstacle, new Coordinates(1, 1)),
-                Arguments.of(facingNorthernLimit, new Coordinates(1, 0)),
+                Arguments.of(facingNoObstacle, new Coordinates(0, 0)),
+                Arguments.of(facingNorthernLimit, new Coordinates(0, 0)),
                 Arguments.of(facingEasternLimit, new Coordinates(2, 3)),
-                Arguments.of(facingSouthernLimit, new Coordinates(1, 3)),
-                Arguments.of(facingWesternLimit, new Coordinates(0, 2))
+                Arguments.of(facingSouthernLimit, new Coordinates(2, 3)),
+                Arguments.of(facingWesternLimit, new Coordinates(0, 2)),
+                Arguments.of(facingMountain, new Coordinates(1, 1)),
+                Arguments.of(facingOtherPlayer, new Coordinates(2, 3))
         };
         return Stream.of(arguments);
     }

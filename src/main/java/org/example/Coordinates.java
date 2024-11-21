@@ -24,4 +24,5 @@ public record Coordinates(int westEast, int northSouth) {
     public Coordinates westOf() {
         return this.withWestEast(westEast - 1);
     }
+
 }

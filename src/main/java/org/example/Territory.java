@@ -138,9 +138,24 @@ public class Territory {
     }
 
     void moveForward(Player player) {
-        if(!this.isOutOfBound(player.getFuturePosition())) {
+        Coordinates futurePosition = player.getFuturePosition();
+        if (!this.isOutOfBound(futurePosition)
+            && !this.collidesWithMountain(futurePosition)
+            && !this.collidesWithAnotherPlayer(futurePosition)) {
             player.moveForward();
         }
+    }
+
+    private boolean collidesWithMountain(Coordinates futurePosition) {
+        return this.mountains
+                .stream()
+                .anyMatch(mountain -> mountain.collidesWith(futurePosition));
+    }
+
+    private boolean collidesWithAnotherPlayer(Coordinates futurePosition) {
+        return this.players
+                .stream()
+                .anyMatch(otherPlayer -> otherPlayer.collidesWith(futurePosition));
     }
 
 }
