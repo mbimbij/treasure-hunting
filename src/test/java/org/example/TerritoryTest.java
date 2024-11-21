@@ -209,6 +209,32 @@ class TerritoryTest {
         // THEN
         assertThat(player1.getCoordinates()).isEqualTo(expectedCoordinates);
     }
+
+    @Test
+    void collect_treasure_if_stepping_on_treasure_but_not_if_staying_on_it() {
+        // GIVEN
+        int width = 3;
+        int height = 4;
+        Player player1 = new Player("p2", new Coordinates(0, 2), SOUTH);
+        Territory territory = new Territory(width,
+                height,
+                of(new Mountain(1, 0),
+                        new Mountain(2, 1),
+                        new Mountain(1, 2)
+                ),
+                of(
+                        new Treasure(0, 3, 2),
+                        new Treasure(1, 3, 3)
+                ),
+                of(player1));
+
+        // WHEN
+        territory.moveForward(player1);
+
+        // THEN
+        assertThat(player1.getCollectedTreasuresCount()).isEqualTo(1);
+    }
+
     private static Stream<Arguments> should_move_player_forward_respecting_boundaries_and_collisions() {
         Player facingNoObstacle = new Player("player1", new Coordinates(0, 1), NORTH);
         Player facingNorthernLimit = new Player("player1", new Coordinates(0, 0), NORTH);

@@ -6,6 +6,7 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.counting;
@@ -33,6 +34,16 @@ public class Territory {
     // TODO question au PO: min joueur: 0 ou 1 ? max joueurs: un nombre constant, en entrée de l'application, ou calculé en
     private final List<Player> players;
 
+    /**
+     * // TODO Introduce a builder maybe ? The desire to use the same Territory in multiple tests cases calls for some
+     * sort of builder, and calling the validation logic on "build()" or some "startSimulation() method"
+     *
+     * @param width
+     * @param height
+     * @param mountains
+     * @param treasures
+     * @param players
+     */
     public Territory(int width, int height, List<Mountain> mountains, List<Treasure> treasures, List<Player> players) {
         this.width = width;
         this.height = height;
@@ -139,11 +150,26 @@ public class Territory {
 
     void moveForward(Player player) {
         Coordinates futurePosition = player.getFuturePosition();
-        if (!this.isOutOfBound(futurePosition)
-            && !this.collidesWithMountain(futurePosition)
-            && !this.collidesWithAnotherPlayer(futurePosition)) {
-            player.moveForward();
+        if (this.isOutOfBound(futurePosition)
+            || this.collidesWithMountain(futurePosition)
+            || this.collidesWithAnotherPlayer(futurePosition)) {
+            return;
         }
+        player.moveForward();
+        Optional<Treasure> treasure1 = getTreasure(player);
+        treasure1
+                .ifPresent(t -> {
+                    t.collectTreasure();
+                    player.collectTreasure();
+                });
+    }
+
+    private Optional<Treasure> getTreasure(Player player) {
+        return this.treasures
+                .stream()
+                .filter(treasure -> treasure.collidesWith(player.getCoordinates()))
+                .findAny()
+                .filter(treasure -> treasure.quantity() > 0);
     }
 
     private boolean collidesWithMountain(Coordinates futurePosition) {

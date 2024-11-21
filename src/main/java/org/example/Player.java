@@ -26,13 +26,13 @@ public class Player implements CanCollideWith {
     private final String name;
     private Coordinates coordinates;
     private Orientation orientation;
-    private int treasuresCount;
+    private int collectedTreasuresCount;
 
     public Player(String name, Coordinates coordinates, Orientation orientation) {
         this.orientation = orientation;
         this.name = name;
         this.coordinates = coordinates;
-        this.treasuresCount = 0;
+        this.collectedTreasuresCount = 0;
     }
 
     public void moveForward() {
@@ -65,5 +65,9 @@ public class Player implements CanCollideWith {
 
     public void turnRight() {
         this.orientation = this.orientation.rightOf();
+    }
+
+    public void collectTreasure() {
+        this.collectedTreasuresCount++;
     }
 }
