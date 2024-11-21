@@ -3,10 +3,13 @@ package org.example;
 import com.speedment.common.mapstream.MapStream;
 import lombok.Getter;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.groupingBy;
 
 /**
  * Represent 'Madre de Dios' territory. I opted for a noun for the class name and 'Madre de Dios' for the instance.
@@ -15,14 +18,20 @@ import static java.util.function.Function.identity;
  */
 @Getter
 public class Territory {
-    private final int width;
-    private final int height;
-    private final List<Mountain> mountains;
-    private final List<Treasure> treasures;
-    private final List<Player> players;
     public static final String OVERLAPPING_FEATURES_ERROR_MESSAGE_FORMAT = "Cannot build territory because of overlapping features at %s";
     public static final String DUPLICATE_PLAYERS_NAMES_ERROR_MESSAGE_FORMAT = "Cannot build territory because of duplicate players names: %s";
     public static final String INVALID_TERRITORY_SIZE_ERROR_MESSAGE_FORMAT = "Width and height must be greater than zero but were {%d, %d}";
+    public static final String FEATURES_COORDINATES_OUT_OF_BOUND_ERROR_MESSAGE = "Some features are located outside the territory: %s";
+
+    // TODO question au PO: min et max pour la largeur et la hauteur de la carte ? Si oui, amha, la validation devrait être sortie de la classe Territory, mais il y a de bons arguments pour le contraire.
+    private final int width;
+    private final int height;
+    // TODO question au PO: min montagnes: 0  1 ? max montagnes: un nombre constant, en entrée de l'application, ou calculé en fonction de la taille de la carte et du nombre de features ?
+    private final List<Mountain> mountains;
+    // TODO question au PO: min trésors: 0 ou 1 ? max trésors: un nombre constant, en entrée de l'application, ou calculé en
+    private final List<Treasure> treasures;
+    // TODO question au PO: min joueur: 0 ou 1 ? max joueurs: un nombre constant, en entrée de l'application, ou calculé en
+    private final List<Player> players;
 
     public Territory(int width, int height, List<Mountain> mountains, List<Treasure> treasures, List<Player> players) {
         this.width = width;
@@ -33,10 +42,28 @@ public class Territory {
         validate();
     }
 
+    /**
+     * As the validation logic grows, it might be appropriate to put it in either a factory or a Validator. Especially
+     * considering the possibility of validating min and max values for width, height, number of mountains, treasures,
+     * players. Or considering even more complex validation logic and procedural generation.
+     */
     private void validate() {
         validateTerritorySize();
         validateNoOverlappingFeatures();
+        validateNoFeatureOutOfBound();
         validateNoDuplicateAlayerName();
+    }
+
+    private void validateNoFeatureOutOfBound() {
+        List<Coordinates> allFeaturesCoordinates = getAllFeaturesCoordinates();
+        Map<Coordinates, Long> outOfBoundFeatureCoordinates = allFeaturesCoordinates.stream()
+                .filter(coordinates -> coordinates.isOutOfBound(width, height))
+                .collect(groupingBy(identity(), counting()));
+        if(!outOfBoundFeatureCoordinates.isEmpty()){
+            String message = FEATURES_COORDINATES_OUT_OF_BOUND_ERROR_MESSAGE
+                    .formatted(outOfBoundFeatureCoordinates.keySet());
+            throw new IllegalArgumentException(message);
+        }
     }
 
     private void validateTerritorySize() {
@@ -52,14 +79,14 @@ public class Territory {
     private void validateNoOverlappingFeatures() {
         List<Coordinates> allFeaturesCoordinates = getAllFeaturesCoordinates();
         Map<Coordinates, Long> featuresCountByCoordinate = allFeaturesCoordinates.stream()
-                .collect(Collectors.groupingBy(identity(),
-                        Collectors.counting()));
+                .collect(groupingBy(identity(),
+                        counting()));
 
         Map<Coordinates, Long> overlapsCountByCoordinate = MapStream.of(featuresCountByCoordinate)
                 .filterValue(count -> count > 1)
                 .toMap();
 
-        if(!overlapsCountByCoordinate.isEmpty()){
+        if (!overlapsCountByCoordinate.isEmpty()) {
             String overlapsString = overlapsCountByCoordinate.keySet().toString();
             String message = OVERLAPPING_FEATURES_ERROR_MESSAGE_FORMAT.formatted(overlapsString);
             throw new IllegalArgumentException(message);
@@ -68,13 +95,13 @@ public class Territory {
 
     private void validateNoDuplicateAlayerName() {
         Map<String, Long> playersCountByName = this.players.stream()
-                .collect(Collectors.groupingBy(Player::getName, Collectors.counting()));
+                .collect(groupingBy(Player::getName, counting()));
 
         Map<String, Long> duplicateAlayersNames = MapStream.of(playersCountByName)
                 .filterValue(count -> count > 1)
                 .toMap();
 
-        if(!duplicateAlayersNames.isEmpty()){
+        if (!duplicateAlayersNames.isEmpty()) {
             String duplicatePlayersNamesString = duplicateAlayersNames.keySet().toString();
             String message = DUPLICATE_PLAYERS_NAMES_ERROR_MESSAGE_FORMAT.formatted(duplicatePlayersNamesString);
             throw new IllegalArgumentException(message);

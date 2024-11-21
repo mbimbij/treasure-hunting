@@ -20,9 +20,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class TreasureHuntingApplicationShould {
 
     private static final Coordinates COORDINATES_1_1 = new Coordinates(1, 1);
+    private static final Coordinates COORDINATES_1_2 = new Coordinates(1, 2);
     private static final Treasure TREASURE_AT_1_1 = new Treasure(COORDINATES_1_1, 3);
     private static final Mountain MOUNTAIN_AT_1_1 = new Mountain(COORDINATES_1_1);
-    private static final Coordinates COORDINATES_1_2 = new Coordinates(1, 2);
     private static final Player PLAYER_1 = new Player("Player #1",
             COORDINATES_1_1,
             Orientation.NORTH,
@@ -34,10 +34,10 @@ class TreasureHuntingApplicationShould {
     private static final Coordinates COORDINATES_1_3 = new Coordinates(1, 3);
 
     @Property
-    void create_territory_with_specified_size(@ForAll("validPairsOfWidthAndHeight") IntegerPair pai Rr) {
+    void create_territory_with_specified_size(@ForAll("validPairsOfWidthAndHeight") IntegerPair widthHeightPair) {
         // GIVEN
-        Integer width = pair.first();
-        Integer height = pair.second();
+        Integer width = widthHeightPair.first();
+        Integer height = widthHeightPair.second();
 
         // WHEN
         Territory madreDeDios = new Territory(width,
@@ -55,6 +55,7 @@ class TreasureHuntingApplicationShould {
     void create_territory_with_mountains() {
         // GIVEN
         List<Mountain> mountains = of(
+                new Mountain(new Coordinates(0, 0)),
                 MOUNTAIN_AT_1_1,
                 new Mountain(COORDINATES_1_2)
         );
@@ -134,6 +135,31 @@ class TreasureHuntingApplicationShould {
                 .hasMessageStartingWith(expectedErrorMessage);
     }
 
+    // TODO Add more cases
+    @Test
+    void throw_exception_if_multiple_players_have_the_same_name() {
+        // GIVEN
+        List<Player> players = of(
+                PLAYER_1,
+                PLAYER_2.withName(PLAYER_1.getName())
+        );
+        List<String> duplicatePlayersNames = of(PLAYER_1.getName());
+        String expectedErrorMessage = Territory.DUPLICATE_PLAYERS_NAMES_ERROR_MESSAGE_FORMAT
+                .formatted(duplicatePlayersNames);
+
+        // WHEN
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(3,
+                4,
+                emptyList(),
+                emptyList(),
+                players);
+
+        // THEN
+        assertThatThrownBy(throwingCallable)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(expectedErrorMessage);
+    }
+
     @Provide
     Arbitrary<IntegerPair> validPairsOfWidthAndHeight() {
         return Combinators.combine(integers(), integers())
@@ -149,7 +175,8 @@ class TreasureHuntingApplicationShould {
     }
 
     /**
-     * Because JQwik tests are not executed in non-static inner classes, but junit @Nested test classes must be non-static
+     * Because JQwik tests are not executed in non-static inner classes, but junit @Nested test classes must be
+     * non-static
      */
     @Nested
     class OverlappingFeatures {
@@ -204,30 +231,6 @@ class TreasureHuntingApplicationShould {
                     .hasMessageStartingWith(expectedErrorMessage);
         }
 
-        @Test
-        void throw_exception_if_multiple_players_have_the_same_name() {
-            // GIVEN
-            List<Player> players = of(
-                    PLAYER_1,
-                    PLAYER_2.withName(PLAYER_1.getName())
-            );
-            List<String> duplicatePlayersNames = of(PLAYER_1.getName());
-            String expectedErrorMessage = Territory.DUPLICATE_PLAYERS_NAMES_ERROR_MESSAGE_FORMAT
-                    .formatted(duplicatePlayersNames);
-
-            // WHEN
-            ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(3,
-                    4,
-                    emptyList(),
-                    emptyList(),
-                    players);
-
-            // THEN
-            assertThatThrownBy(throwingCallable)
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage(expectedErrorMessage);
-        }
-
         private static Stream<Arguments> throw_exception_if_overlapping_features() {
             return Stream.of(
                     Arguments.of(OVERLAPPING_MOUNTAINS, emptyList(), emptyList()),
@@ -238,6 +241,73 @@ class TreasureHuntingApplicationShould {
                     Arguments.of(emptyList(), of(TREASURE_AT_1_1), of(PLAYER_1)),
                     Arguments.of(of(MOUNTAIN_AT_1_1), of(TREASURE_AT_1_1), of(PLAYER_1))
             );
+        }
+    }
+
+    @Nested
+    class OutOfBoundFeatures {
+
+        private static final int width = 3;
+        private static final int height = 4;
+
+        @ParameterizedTest
+        @MethodSource
+        void throw_exception_if_feature_out_of_bound(Integer width,
+                                                     Integer height,
+                                                     List<Mountain> mountains,
+                                                     List<Coordinates> expectedInvalidCoordinates) {
+            // GIVEN
+            List<Treasure> treasures = emptyList();
+            List<Player> players = emptyList();
+
+            String expectedErrorMessage = Territory.FEATURES_COORDINATES_OUT_OF_BOUND_ERROR_MESSAGE
+                    .formatted(expectedInvalidCoordinates);
+
+            // WHEN
+            ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(width,
+                    height,
+                    mountains,
+                    treasures,
+                    players);
+
+            // THEN
+            assertThatThrownBy(throwingCallable)
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageStartingWith(expectedErrorMessage);
+        }
+
+        private static Stream<Arguments> throw_exception_if_feature_out_of_bound() {
+            Arguments[] arguments = {
+                    Arguments.of(width, height, of(new Mountain(tooMuchWest())), of(tooMuchWest())),
+                    Arguments.of(width, height, of(new Mountain(tooMuchEast())), of(tooMuchEast())),
+                    Arguments.of(width, height, of(new Mountain(tooMuchNorth())), of(tooMuchNorth())),
+                    Arguments.of(width, height, of(new Mountain(tooMuchSouth())), of(tooMuchSouth())),
+                    multipleMountainsOutOfBounds(),
+            };
+            return Stream.of(arguments);
+        }
+
+        private static Arguments multipleMountainsOutOfBounds() {
+            return Arguments.of(width,
+                    height,
+                    of(MOUNTAIN_AT_1_1, new Mountain(tooMuchSouth()), new Mountain(tooMuchWest())),
+                    of(tooMuchSouth(), tooMuchWest()));
+        }
+
+        private static Coordinates tooMuchSouth() {
+            return new Coordinates(1, height + 2);
+        }
+
+        private static Coordinates tooMuchNorth() {
+            return new Coordinates(1, -1);
+        }
+
+        private static Coordinates tooMuchEast() {
+            return new Coordinates(width + 2, 2);
+        }
+
+        private static Coordinates tooMuchWest() {
+            return new Coordinates(-1, 2);
         }
     }
 
