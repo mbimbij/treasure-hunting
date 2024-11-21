@@ -15,7 +15,9 @@ import lombok.With;
  * <p>
  * ETA2: Following "strict" TDD, i should have postponed the introduction of "coordinates", "orientation" and
  * "treasuresCount", but as we know for sure they are in the requirements, it seems appropriate enough to me to do
- * introduce them before the tests. It is not meaningless future-proofing.
+ * introduce them before the tests. It does not appear as meaningless future-proofing.
+ *
+ * TODO à confirmer avec le PO: je pars du principe qu'il est ok que les joueurs n'aient pas une liste de commandes de taille égale et aucune validation n'est exécutée dessus. Vous confirmez ?
  */
 @Getter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -33,5 +35,12 @@ public class Player {
         this.name = name;
         this.coordinates = coordinates;
         this.treasuresCount = treasuresCount;
+    }
+
+    public Player(String name, Coordinates coordinates, Orientation orientation) {
+        this.orientation = orientation;
+        this.name = name;
+        this.coordinates = coordinates;
+        this.treasuresCount = 0;
     }
 }

@@ -1,5 +1,8 @@
 package org.example;
 
+import lombok.With;
+
+@With
 public record Coordinates(int westEast, int northSouth) {
     @Override
     public String toString() {

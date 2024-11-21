@@ -16,9 +16,14 @@ import static java.util.List.of;
 import static net.jqwik.api.Arbitraries.integers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
-class TerritoryShould {
+class TerritoryTest {
+
+    @Nested
+    class CreationShould {
+
+    }
+
     private static final Coordinates COORDINATES_1_1 = new Coordinates(1, 1);
     private static final Coordinates COORDINATES_1_2 = new Coordinates(1, 2);
     private static final Coordinates COORDINATES_1_3 = new Coordinates(1, 3);
@@ -26,16 +31,13 @@ class TerritoryShould {
     private static final Mountain MOUNTAIN_AT_1_1 = new Mountain(COORDINATES_1_1);
     private static final Player PLAYER_1 = new Player("Player #1",
             COORDINATES_1_1,
-            Orientation.NORTH,
-            0);
+            Orientation.NORTH);
     private static final Player PLAYER_2 = new Player("Player #2",
             COORDINATES_1_2,
-            Orientation.NORTH,
-            0);
+            Orientation.NORTH);
     private static final Player PLAYER_3 = new Player("Player #3",
             COORDINATES_1_3,
-            Orientation.NORTH,
-            0);
+            Orientation.NORTH);
 
     @Property
     void create_territory_with_specified_size(@ForAll("validPairsOfWidthAndHeight") IntegerPair widthHeightPair) {
@@ -331,5 +333,38 @@ class TerritoryShould {
     }
 
     record IntegerPair(Integer first, Integer second) {
+    }
+
+    @Test
+    void should_move_player_forward_correctly() {
+        // GIVEN
+        int width = 4;
+        int height = 4;
+        Player player1 = new Player("player1", new Coordinates(0, 0), Orientation.NORTH);
+        Player player2 = new Player("player2", new Coordinates(0, 2), Orientation.NORTH);
+        Player player3 = new Player("player3", new Coordinates(3, 0), Orientation.EAST);
+        Player player4 = new Player("player4", new Coordinates(1, 0), Orientation.EAST);
+        Player player5 = new Player("player5", new Coordinates(3, 3), Orientation.SOUTH);
+        Player player6 = new Player("player6", new Coordinates(3, 1), Orientation.SOUTH);
+        Player player7 = new Player("player7", new Coordinates(0, 3), Orientation.WEST);
+        Player player8 = new Player("player8", new Coordinates(2, 3), Orientation.WEST);
+        Territory territory = new Territory(width,
+                height,
+                emptyList(),
+                emptyList(),
+                of(player1, player2, player3, player4, player5, player6, player7, player8));
+
+        // WHEN
+        territory.playTurn();
+
+        // THEN
+        assertThat(player1.getCoordinates()).isEqualTo(new Coordinates(0, 0));
+        assertThat(player2.getCoordinates()).isEqualTo(new Coordinates(0, 1));
+        assertThat(player3.getCoordinates()).isEqualTo(new Coordinates(3, 0));
+        assertThat(player4.getCoordinates()).isEqualTo(new Coordinates(2, 0));
+        assertThat(player5.getCoordinates()).isEqualTo(new Coordinates(3, 3));
+        assertThat(player6.getCoordinates()).isEqualTo(new Coordinates(3, 2));
+        assertThat(player7.getCoordinates()).isEqualTo(new Coordinates(0, 3));
+        assertThat(player8.getCoordinates()).isEqualTo(new Coordinates(1, 3));
     }
 }
