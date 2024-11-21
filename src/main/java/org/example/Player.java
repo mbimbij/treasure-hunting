@@ -2,6 +2,11 @@ package org.example;
 
 import lombok.*;
 
+import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Queue;
+
 /**
  * Not making it a record, as the treasure count will be mutable, and returning a new instance with changed state feels
  * like overkill at the moment. And thinking in DDD terms, Adventurer feels like an entity rather than a value object,
@@ -27,12 +32,18 @@ public class Player implements CanCollideWith {
     private Coordinates coordinates;
     private Orientation orientation;
     private int collectedTreasuresCount;
+    private Queue<Command> remainingCommands;
 
     public Player(String name, Coordinates coordinates, Orientation orientation) {
+        this(name, coordinates, orientation, new ArrayDeque<>());
+    }
+
+    public Player(String name, Coordinates coordinates, Orientation orientation, Collection<Command> remainingCommands) {
         this.orientation = orientation;
         this.name = name;
         this.coordinates = coordinates;
         this.collectedTreasuresCount = 0;
+        this.remainingCommands = new ArrayDeque<>(remainingCommands);
     }
 
     public void moveForward() {
@@ -69,5 +80,13 @@ public class Player implements CanCollideWith {
 
     public void collectTreasure() {
         this.collectedTreasuresCount++;
+    }
+
+    public Optional<Command> popNextCommand() {
+        return Optional.ofNullable(this.remainingCommands.poll());
+    }
+
+    boolean hasRemainingCommands() {
+        return !getRemainingCommands().isEmpty();
     }
 }

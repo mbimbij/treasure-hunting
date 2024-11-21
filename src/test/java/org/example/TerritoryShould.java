@@ -7,26 +7,22 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.InOrder;
 
+import java.util.ArrayDeque;
 import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 import static java.util.List.of;
 import static net.jqwik.api.Arbitraries.integers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.example.Command.*;
 import static org.example.Orientation.*;
+import static org.mockito.Mockito.*;
 
-class TerritoryTest {
-
-    @Nested
-    class CreationShould {
-
-    }
+class TerritoryShould {
 
     private static final Coordinates COORDINATES_1_1 = new Coordinates(1, 1);
     private static final Coordinates COORDINATES_1_2 = new Coordinates(1, 2);
@@ -212,6 +208,27 @@ class TerritoryTest {
         assertThat(player1.getCoordinates()).isEqualTo(expectedCoordinates);
     }
 
+    @Test
+    void turn_player_left_and_right_when_turn_left_and_right() {
+        // GIVEN
+        int width = 1;
+        int height = 1;
+        Player player = spy(new Player("player", new Coordinates(0, 0), NORTH));
+        Territory territory = new Territory(width,
+                height,
+                emptyList(),
+                emptyList(),
+                of(player));
+
+        // WHEN
+        territory.turnLeft(player);
+        verify(player).turnLeft();
+
+        // AND
+        territory.turnRight(player);
+        verify(player).turnRight();
+    }
+
     /**
      * Uses a map similar to the one described in the instructions <br/>
      * <table border="1">
@@ -220,9 +237,6 @@ class TerritoryTest {
      * <br/>
      * Or, in non formatted javadoc:
      * .    T(3)  T(0)  T(7)
-     *
-     * @param player1
-     * @param expectedCoordinates
      */
     @Test
     void collect_treasure_iff_moving_on_it_and_non_empty() {
@@ -258,6 +272,59 @@ class TerritoryTest {
         assertThat(territory.getTreasures()).extracting(Treasure::quantity).isEqualTo(of(1, 0, 6));
     }
 
+    @Test
+    void execute_sequence_of_commands_on_single_player() {
+        // GIVEN
+        int width = 2;
+        int height = 1;
+
+        List<Command> commands = of(A, G, D, D, G);
+        Player player = new Player("player", new Coordinates(0, 0), NORTH, commands);
+        Territory territory = spy(new Territory(width,
+                height,
+                emptyList(),
+                emptyList(),
+                of(player)));
+
+        // WHEN
+        territory.runSimulation();
+
+        // THEN
+        InOrder inOrder = inOrder(territory);
+        inOrder.verify(territory).moveForward(player);
+        inOrder.verify(territory).turnLeft(player);
+        inOrder.verify(territory, times(2)).turnRight(player);
+        inOrder.verify(territory).turnLeft(player);
+    }
+
+    @Test
+    void execute_sequence_of_commands_on_multiple_players() {
+        // GIVEN
+        int width = 3;
+        int height = 2;
+
+        Player player1 = new Player("player", new Coordinates(0, 0), EAST, of(A, G, D, D, G));
+        Player player2 = new Player("player2", new Coordinates(2, 1), WEST, of(D, A, G));
+        Territory territory = spy(new Territory(width,
+                height,
+                emptyList(),
+                emptyList(),
+                of(player1, player2)));
+
+        // WHEN
+        territory.runSimulation();
+
+        // THEN
+        InOrder inOrder = inOrder(territory);
+        inOrder.verify(territory).moveForward(player1);
+        inOrder.verify(territory).turnRight(player2);
+        inOrder.verify(territory).turnLeft(player1);
+        inOrder.verify(territory).moveForward(player2);
+        inOrder.verify(territory).turnRight(player1);
+        inOrder.verify(territory).turnLeft(player2);
+        inOrder.verify(territory).turnRight(player1);
+        inOrder.verify(territory).turnLeft(player1);
+    }
 
     private static Stream<Arguments> should_move_player_forward_respecting_boundaries_and_collisions() {
         Player facingNoObstacle = new Player("player1", new Coordinates(0, 1), NORTH);
@@ -459,8 +526,8 @@ class TerritoryTest {
 
     }
 
-    record IntegerPair(Integer first, Integer second) {
 
+}
 
-    }
+record IntegerPair(Integer first, Integer second) {
 }

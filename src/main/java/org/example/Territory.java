@@ -53,8 +53,23 @@ public class Territory {
         validate();
     }
 
-    public void playTurn() {
+    public void runSimulation() {
+        while (commandsRemaining()) {
+            playTurn();
+        }
+    }
 
+    public void playTurn() {
+        for (Player player : players) {
+            player.popNextCommand().ifPresent(command -> {
+                switch (command) {
+                    case A -> moveForward(player);
+                    case G -> turnLeft(player);
+                    case D -> turnRight(player);
+                }
+                ;
+            });
+        }
     }
 
     /**
@@ -195,4 +210,9 @@ public class Territory {
     public void turnRight(Player player) {
         player.turnRight();
     }
+
+    private boolean commandsRemaining() {
+        return players.stream().anyMatch(Player::hasRemainingCommands);
+    }
+
 }
