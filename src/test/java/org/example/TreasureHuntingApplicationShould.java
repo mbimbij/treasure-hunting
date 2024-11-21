@@ -21,6 +21,7 @@ class TreasureHuntingApplicationShould {
 
     private static final Coordinates COORDINATES_1_1 = new Coordinates(1, 1);
     private static final Coordinates COORDINATES_1_2 = new Coordinates(1, 2);
+    private static final Coordinates COORDINATES_1_3 = new Coordinates(1, 3);
     private static final Treasure TREASURE_AT_1_1 = new Treasure(COORDINATES_1_1, 3);
     private static final Mountain MOUNTAIN_AT_1_1 = new Mountain(COORDINATES_1_1);
     private static final Player PLAYER_1 = new Player("Player #1",
@@ -31,7 +32,10 @@ class TreasureHuntingApplicationShould {
             COORDINATES_1_2,
             Orientation.NORTH,
             0);
-    private static final Coordinates COORDINATES_1_3 = new Coordinates(1, 3);
+    private static final Player PLAYER_3 = new Player("Player #3",
+            COORDINATES_1_3,
+            Orientation.NORTH,
+            0);
 
     @Property
     void create_territory_with_specified_size(@ForAll("validPairsOfWidthAndHeight") IntegerPair widthHeightPair) {
@@ -136,14 +140,10 @@ class TreasureHuntingApplicationShould {
     }
 
     // TODO Add more cases
-    @Test
-    void throw_exception_if_multiple_players_have_the_same_name() {
+    @ParameterizedTest
+    @MethodSource
+    void throw_exception_if_multiple_players_have_the_same_name(List<Player> players, List<String> duplicatePlayersNames) {
         // GIVEN
-        List<Player> players = of(
-                PLAYER_1,
-                PLAYER_2.withName(PLAYER_1.getName())
-        );
-        List<String> duplicatePlayersNames = of(PLAYER_1.getName());
         String expectedErrorMessage = Territory.DUPLICATE_PLAYERS_NAMES_ERROR_MESSAGE_FORMAT
                 .formatted(duplicatePlayersNames);
 
@@ -158,6 +158,25 @@ class TreasureHuntingApplicationShould {
         assertThatThrownBy(throwingCallable)
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(expectedErrorMessage);
+    }
+
+    private static Stream<Arguments> throw_exception_if_multiple_players_have_the_same_name() {
+        Arguments oneDuplicate = Arguments.of(of(PLAYER_1, PLAYER_1.withCoordinates(COORDINATES_1_2)), of(PLAYER_1.getName()));
+        Arguments twoDuplicates = Arguments.of(of(
+                        PLAYER_1.withCoordinates(new Coordinates(0, 0)),
+                        PLAYER_1.withCoordinates(new Coordinates(0, 1)),
+                        PLAYER_2.withCoordinates(new Coordinates(1, 0)),
+                        PLAYER_2.withCoordinates(new Coordinates(1, 1)),
+                        PLAYER_3.withCoordinates(new Coordinates(2, 0))
+                ),
+                of(PLAYER_1.getName(), PLAYER_2.getName()));
+
+        Arguments[] arguments = {
+                oneDuplicate,
+                twoDuplicates,
+        };
+
+        return Stream.of(arguments);
     }
 
     @Provide
