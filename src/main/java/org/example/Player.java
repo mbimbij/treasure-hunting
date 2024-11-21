@@ -2,10 +2,6 @@ package org.example;
 
 import lombok.*;
 
-import java.util.Objects;
-
-import static org.example.Orientation.NORTH;
-
 /**
  * Not making it a record, as the treasure count will be mutable, and returning a new instance with changed state feels
  * like overkill at the moment. And thinking in DDD terms, Adventurer feels like an entity rather than a value object,
@@ -59,7 +55,15 @@ public class Player implements CanCollideWith {
     }
 
     @Override
-    public boolean collidesWith(Coordinates otherCoordinates) {
-        return this.coordinates.equals(otherCoordinates);
+    public Coordinates coordinates() {
+        return getCoordinates();
+    }
+
+    public void turnLeft() {
+        this.orientation = this.orientation.leftOf();
+    }
+
+    public void turnRight() {
+        this.orientation = this.orientation.rightOf();
     }
 }
