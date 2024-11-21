@@ -237,7 +237,6 @@ class TerritoryShould {
      * <br/>
      * Or, in non formatted javadoc:
      * .    T(3)  T(0)  T(7)
-     *
      */
     @Test
     void collect_treasure_iff_moving_on_it_and_non_empty() {
@@ -304,7 +303,7 @@ class TerritoryShould {
         int width = 3;
         int height = 2;
 
-        Player player1 = new Player("player", new Coordinates(0, 0), EAST, of(A, G, D));
+        Player player1 = new Player("player", new Coordinates(0, 0), EAST, of(A, G, D, D, G));
         Player player2 = new Player("player2", new Coordinates(2, 1), WEST, of(D, A, G));
         Territory territory = spy(new Territory(width,
                 height,
@@ -323,6 +322,8 @@ class TerritoryShould {
         inOrder.verify(territory).moveForward(player2);
         inOrder.verify(territory).turnRight(player1);
         inOrder.verify(territory).turnLeft(player2);
+        inOrder.verify(territory).turnRight(player1);
+        inOrder.verify(territory).turnLeft(player1);
     }
 
     private static Stream<Arguments> should_move_player_forward_respecting_boundaries_and_collisions() {
