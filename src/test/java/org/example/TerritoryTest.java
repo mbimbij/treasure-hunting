@@ -16,26 +16,30 @@ import static java.util.List.of;
 import static net.jqwik.api.Arbitraries.integers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.example.Orientation.*;
 
-class TerritoryShould {
+class TerritoryTest {
+
+    @Nested
+    class CreationShould {
+
+    }
+
     private static final Coordinates COORDINATES_1_1 = new Coordinates(1, 1);
     private static final Coordinates COORDINATES_1_2 = new Coordinates(1, 2);
     private static final Coordinates COORDINATES_1_3 = new Coordinates(1, 3);
     private static final Treasure TREASURE_AT_1_1 = new Treasure(COORDINATES_1_1, 3);
     private static final Mountain MOUNTAIN_AT_1_1 = new Mountain(COORDINATES_1_1);
+
     private static final Player PLAYER_1 = new Player("Player #1",
             COORDINATES_1_1,
-            Orientation.NORTH,
-            0);
+            NORTH);
     private static final Player PLAYER_2 = new Player("Player #2",
             COORDINATES_1_2,
-            Orientation.NORTH,
-            0);
+            NORTH);
     private static final Player PLAYER_3 = new Player("Player #3",
             COORDINATES_1_3,
-            Orientation.NORTH,
-            0);
+            NORTH);
 
     @Property
     void create_territory_with_specified_size(@ForAll("validPairsOfWidthAndHeight") IntegerPair widthHeightPair) {
@@ -59,7 +63,7 @@ class TerritoryShould {
     void create_territory_with_mountains() {
         // GIVEN
         List<Mountain> mountains = of(
-                new Mountain(new Coordinates(0, 0)),
+                new Mountain(0, 0),
                 MOUNTAIN_AT_1_1,
                 new Mountain(COORDINATES_1_2)
         );
@@ -296,11 +300,15 @@ class TerritoryShould {
         }
 
         private static Stream<Arguments> throw_exception_if_feature_out_of_bound() {
+            Coordinates coordinates = tooMuchSouth();
+            Coordinates coordinates1 = tooMuchNorth();
+            Coordinates coordinates2 = tooMuchEast();
+            Coordinates coordinates3 = tooMuchWest();
             Arguments[] arguments = {
-                    Arguments.of(width, height, of(new Mountain(tooMuchWest())), of(tooMuchWest())),
-                    Arguments.of(width, height, of(new Mountain(tooMuchEast())), of(tooMuchEast())),
-                    Arguments.of(width, height, of(new Mountain(tooMuchNorth())), of(tooMuchNorth())),
-                    Arguments.of(width, height, of(new Mountain(tooMuchSouth())), of(tooMuchSouth())),
+                    Arguments.of(width, height, of(new Mountain(coordinates3)), of(tooMuchWest())),
+                    Arguments.of(width, height, of(new Mountain(coordinates2)), of(tooMuchEast())),
+                    Arguments.of(width, height, of(new Mountain(coordinates1)), of(tooMuchNorth())),
+                    Arguments.of(width, height, of(new Mountain(coordinates)), of(tooMuchSouth())),
                     multipleMountainsOutOfBounds(),
             };
             return Stream.of(arguments);
@@ -331,5 +339,52 @@ class TerritoryShould {
     }
 
     record IntegerPair(Integer first, Integer second) {
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void should_move_player_forward_respecting_boundaries_and_collisions(Player player1, Coordinates expectedCoordinates) {
+        // GIVEN
+        int width = 3;
+        int height = 4;
+        Player player2 = new Player("player2", new Coordinates(2, 2), NORTH);
+        List<Player> players = of(player1, player2);
+        Territory territory = new Territory(width,
+                height,
+                of(new Mountain(1, 0),
+                        new Mountain(2, 1),
+                        new Mountain(1, 2)
+                ),
+                of(
+                        new Treasure(0, 3, 2),
+                        new Treasure(1, 3, 3)
+                ),
+                players);
+
+        // WHEN
+        territory.moveForward(player1);
+
+        // THEN
+        assertThat(player1.getCoordinates()).isEqualTo(expectedCoordinates);
+    }
+
+    private static Stream<Arguments> should_move_player_forward_respecting_boundaries_and_collisions() {
+        Player facingNoObstacle = new Player("player1", new Coordinates(0, 1), NORTH);
+        Player facingNorthernLimit = new Player("player1", new Coordinates(0, 0), NORTH);
+        Player facingEasternLimit = new Player("player1", new Coordinates(2, 3), EAST);
+        Player facingSouthernLimit = new Player("player1", new Coordinates(2, 3), SOUTH);
+        Player facingWesternLimit = new Player("player1", new Coordinates(0, 2), WEST);
+        Player facingMountain = new Player("player", new Coordinates(1, 1), NORTH);
+        Player facingOtherPlayer = new Player("player", new Coordinates(2, 3), NORTH);
+        Arguments[] arguments = new Arguments[]{
+                Arguments.of(facingNoObstacle, new Coordinates(0, 0)),
+                Arguments.of(facingNorthernLimit, new Coordinates(0, 0)),
+                Arguments.of(facingEasternLimit, new Coordinates(2, 3)),
+                Arguments.of(facingSouthernLimit, new Coordinates(2, 3)),
+                Arguments.of(facingWesternLimit, new Coordinates(0, 2)),
+                Arguments.of(facingMountain, new Coordinates(1, 1)),
+                Arguments.of(facingOtherPlayer, new Coordinates(2, 3))
+        };
+        return Stream.of(arguments);
     }
 }

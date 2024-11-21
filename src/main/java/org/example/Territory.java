@@ -42,28 +42,46 @@ public class Territory {
         validate();
     }
 
+    public void playTurn() {
+
+    }
+
     /**
      * As the validation logic grows, it might be appropriate to put it in either a factory or a Validator. Especially
      * considering the possibility of validating min and max values for width, height, number of mountains, treasures,
-     * players. Or considering even more complex validation logic and procedural generation.
+     * players. Or considering even more complex validation logic and creation logic, like procedural generation.
      */
     private void validate() {
         validateTerritorySize();
         validateNoOverlappingFeatures();
         validateNoFeatureOutOfBound();
-        validateNoDuplicateAlayerName();
+        validateNoDuplicatePlayerName();
     }
 
     private void validateNoFeatureOutOfBound() {
         List<Coordinates> allFeaturesCoordinates = getAllFeaturesCoordinates();
         Map<Coordinates, Long> outOfBoundFeatureCoordinates = allFeaturesCoordinates.stream()
-                .filter(coordinates -> coordinates.isOutOfBound(width, height))
+                .filter(this::isOutOfBound)
                 .collect(groupingBy(identity(), counting()));
-        if(!outOfBoundFeatureCoordinates.isEmpty()){
+        if (!outOfBoundFeatureCoordinates.isEmpty()) {
             String message = FEATURES_COORDINATES_OUT_OF_BOUND_ERROR_MESSAGE
                     .formatted(outOfBoundFeatureCoordinates.keySet());
             throw new IllegalArgumentException(message);
         }
+    }
+
+    /**
+     * Decided on moving that method back to Territory class as otherwise it felt like the logic of the territory was
+     * leaking into the Coordinates class.
+     *
+     * @param coordinates
+     * @return
+     */
+    private boolean isOutOfBound(Coordinates coordinates) {
+        return coordinates.westEast() < 0
+               || coordinates.westEast() >= width
+               || coordinates.northSouth() < 0
+               || coordinates.northSouth() >= height;
     }
 
     private void validateTerritorySize() {
@@ -93,7 +111,7 @@ public class Territory {
         }
     }
 
-    private void validateNoDuplicateAlayerName() {
+    private void validateNoDuplicatePlayerName() {
         Map<String, Long> playersCountByName = this.players.stream()
                 .collect(groupingBy(Player::getName, counting()));
 
@@ -117,6 +135,27 @@ public class Territory {
         allFeaturesCoordinates.addAll(mountainsCoordinates);
         allFeaturesCoordinates.addAll(playersCoordinates);
         return allFeaturesCoordinates;
+    }
+
+    void moveForward(Player player) {
+        Coordinates futurePosition = player.getFuturePosition();
+        if (!this.isOutOfBound(futurePosition)
+            && !this.collidesWithMountain(futurePosition)
+            && !this.collidesWithAnotherPlayer(futurePosition)) {
+            player.moveForward();
+        }
+    }
+
+    private boolean collidesWithMountain(Coordinates futurePosition) {
+        return this.mountains
+                .stream()
+                .anyMatch(mountain -> mountain.collidesWith(futurePosition));
+    }
+
+    private boolean collidesWithAnotherPlayer(Coordinates futurePosition) {
+        return this.players
+                .stream()
+                .anyMatch(otherPlayer -> otherPlayer.collidesWith(futurePosition));
     }
 
 }
