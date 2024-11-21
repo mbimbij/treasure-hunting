@@ -34,7 +34,7 @@ class TreasureHuntingApplicationShould {
     private static final Coordinates COORDINATES_1_3 = new Coordinates(1, 3);
 
     @Property
-    void create_territory_with_specified_size(@ForAll("validPairsOfWidthAndHeight") IntegerPair pair) {
+    void create_territory_with_specified_size(@ForAll("validPairsOfWidthAndHeight") IntegerPair pai Rr) {
         // GIVEN
         Integer width = pair.first();
         Integer height = pair.second();
