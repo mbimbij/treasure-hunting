@@ -1,18 +1,16 @@
 package org.example.infra;
 
 import org.assertj.core.api.ThrowableAssert;
+import org.example.TestDataFactory;
 import org.example.domain.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.util.List;
-
 import static java.util.List.of;
 import static org.assertj.core.api.Assertions.*;
 import static org.example.domain.Command.*;
 import static org.example.domain.Orientation.NORTH;
-import static org.example.domain.Orientation.SOUTH;
 
 class InputReaderShould {
 
@@ -25,10 +23,10 @@ class InputReaderShould {
         TerritoryData territoryData = InputReader.readFile(filePath);
 
         // THEN
-        assertThat(territoryData.getSize()).isEqualTo(new Territory.Size(3, 4));
-        assertThat(territoryData.getMountains()).isEqualTo(getMountainsFromInstructions());
-        assertThat(territoryData.getTreasures()).isEqualTo(getTreasuresFromInstructions());
-        assertThat(territoryData.getPlayers()).isEqualTo(of(getPlayerLara()));
+        assertThat(territoryData.getSize()).isEqualTo(TestDataFactory.sizeFromInstructions());
+        assertThat(territoryData.getMountains()).isEqualTo(TestDataFactory.mountainsFromInstructions());
+        assertThat(territoryData.getTreasures()).isEqualTo(TestDataFactory.treasuresFromInstructions());
+        assertThat(territoryData.getPlayers()).isEqualTo(of(TestDataFactory.playerLara()));
     }
 
     @Test
@@ -42,7 +40,7 @@ class InputReaderShould {
         // THEN
         assertThat(territoryData).extracting(TerritoryData::getSize)
                 .isNotNull()
-                .isEqualTo(new Territory.Size(3, 4));
+                .isEqualTo(TestDataFactory.sizeFromInstructions());
     }
 
     @Test
@@ -71,7 +69,7 @@ class InputReaderShould {
         InputReader.readLine("M - 2 - 1", territoryData);
 
         // THEN
-        assertThat(territoryData.getMountains()).isEqualTo(getMountainsFromInstructions());
+        assertThat(territoryData.getMountains()).isEqualTo(TestDataFactory.mountainsFromInstructions());
     }
 
     @Test
@@ -84,7 +82,7 @@ class InputReaderShould {
         InputReader.readLine("T - 1 - 3 - 3", territoryData);
 
         // THEN
-        assertThat(territoryData.getTreasures()).isEqualTo(getTreasuresFromInstructions());
+        assertThat(territoryData.getTreasures()).isEqualTo(TestDataFactory.treasuresFromInstructions());
     }
 
     @Test
@@ -97,7 +95,7 @@ class InputReaderShould {
         InputReader.readLine("A - Jones - 2 - 2 - N - ADGGAGDDGA", territoryData);
 
         // THEN
-        Player lara = getPlayerLara();
+        Player lara = TestDataFactory.playerLara();
         Player jones = new Player("Jones",
                 new Coordinates(2, 2),
                 NORTH,
@@ -151,22 +149,5 @@ class InputReaderShould {
         assertThat(territoryData.getMountains()).isEmpty();
         assertThat(territoryData.getTreasures()).isEmpty();
         assertThat(territoryData.getPlayers()).isEmpty();
-    }
-
-    private List<Mountain> getMountainsFromInstructions() {
-        return of(new Mountain(1, 0),
-                new Mountain(2, 1));
-    }
-
-    private List<Treasure> getTreasuresFromInstructions() {
-        return of(new Treasure(0, 3, 2),
-                new Treasure(1, 3, 3));
-    }
-
-    private Player getPlayerLara() {
-        return new Player("Lara",
-                new Coordinates(1, 1),
-                SOUTH,
-                of(A, A, D, A, D, A, G, G, A));
     }
 }

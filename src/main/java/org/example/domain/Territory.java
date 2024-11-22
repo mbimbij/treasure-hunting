@@ -75,8 +75,8 @@ public class Territory {
 
     /**
      * At the moment, as the application is simple enough, and for early stages of the project, i decided to place the
-     * have the territory validate itself at construction time for the sake of simplicity and not over-engineer things. Also early on, data
-     * and validation itself was pretty cohesive
+     * have the territory validate itself at construction time for the sake of simplicity and not over-engineer things.
+     * Also early on, data and validation itself was pretty cohesive
      * <p>
      * As the validation logic and the class itself grows, it might be appropriate to put it in either a Factory or a
      * Validator, in order to 1) Prevent bloating, 2) enforce separation of concerns between validating simulation
@@ -85,6 +85,9 @@ public class Territory {
      * Especially considering the possibility of validating min and max values for width, height, number of mountains,
      * treasures, players. Or considering even more complex validation logic and creation logic, like procedural
      * generation.
+     * <p>
+     * ETA: At that point the validation is large enough, and it is 100% valid to consider it a separate concern or
+     * "responsibility" / "reason to change". If time allows, it will be extracted
      */
     private void validate() {
         validateTerritorySize();
@@ -224,6 +227,6 @@ public class Territory {
         return players.stream().anyMatch(Player::hasRemainingCommands);
     }
 
-    public record Size(Integer first, Integer second) {
+    public record Size(Integer width, Integer height) {
     }
 }

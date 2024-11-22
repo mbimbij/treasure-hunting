@@ -2,6 +2,7 @@ package org.example.domain;
 
 import net.jqwik.api.*;
 import org.assertj.core.api.ThrowableAssert;
+import org.example.TestDataFactory;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -42,8 +43,8 @@ class TerritoryShould {
     @Property
     void create_territory_with_specified_size(@ForAll("validPairsOfWidthAndHeight") Territory.Size widthHeightPair) {
         // GIVEN
-        Integer width = widthHeightPair.first();
-        Integer height = widthHeightPair.second();
+        Integer width = widthHeightPair.width();
+        Integer height = widthHeightPair.height();
 
         // WHEN
         Territory madreDeDios = new Territory(width,
@@ -124,8 +125,8 @@ class TerritoryShould {
     @Property
     void throw_exception_for_invalid_width_or_height(@ForAll("invalidPairsOfWidthAndHeight") Territory.Size pair) {
         // GIVEN
-        Integer width = pair.first();
-        Integer height = pair.second();
+        Integer width = pair.width();
+        Integer height = pair.height();
         String expectedErrorMessage = Territory.INVALID_TERRITORY_SIZE_ERROR_MESSAGE_FORMAT.formatted(width, height);
 
         // WHEN
@@ -341,13 +342,8 @@ class TerritoryShould {
                 SOUTH,
                 3,
                 emptyList());
-        List<Mountain> mountains = of(new Mountain(1, 0),
-                new Mountain(2, 1)
-        );
-        List<Treasure> treasures = of(
-                new Treasure(0, 3, 2),
-                new Treasure(1, 3, 3)
-        );
+        List<Mountain> mountains = TestDataFactory.mountainsFromInstructions();
+        List<Treasure> treasures = TestDataFactory.treasuresFromInstructions();
         Territory territory = new Territory(width,
                 height,
                 mountains,
@@ -450,7 +446,7 @@ class TerritoryShould {
          * considered as one.
          * TODO validate with PO: overlapping treasure are considered as errors, and we would rather
          * fail fast. The PO might have another opinion on the matter, like adding the treasure or ignoring all except the
-         * first or last one.
+         * width or last one.
          *
          * @param mountains
          * @param treasures
