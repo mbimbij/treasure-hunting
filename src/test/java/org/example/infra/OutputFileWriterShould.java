@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import static java.util.List.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assumptions.assumeThat;
 import static org.example.TestDataFactory.*;
@@ -40,7 +41,7 @@ class OutputFileWriterShould {
                 size.height(),
                 mountainsFromInstructions(),
                 treasuresFromInstructions(),
-                List.of(playerLara()));
+                of(playerLara()));
 
         Path outputDirPath = Paths.get("target");
         Path outputFilePath = Paths.get("target", "output.txt");
@@ -78,10 +79,10 @@ class OutputFileWriterShould {
         Mountain mountain = new Mountain(1, 0);
 
         // WHEN
-        String formattedSize = outputFileWriter.formatMountain(mountain);
+        String formattedMountain = outputFileWriter.formatMountain(mountain);
 
         // THEN
-        assertThat(formattedSize).isEqualTo("M - 1 - 0");
+        assertThat(formattedMountain).isEqualTo("M - 1 - 0");
     }
 
     @Test
@@ -90,10 +91,44 @@ class OutputFileWriterShould {
         Treasure treasure = new Treasure(1, 0, 2);
 
         // WHEN
-        String formattedSize = outputFileWriter.formatTreasure(treasure);
+        String formattedTreasure = outputFileWriter.formatTreasure(treasure);
 
         // THEN
-        assertThat(formattedSize).isEqualTo("T - 1 - 0 - 2");
+        assertThat(formattedTreasure).isEqualTo("T - 1 - 0 - 2");
+    }
+
+    /**
+     * Tons of ways to verify it:
+     * <p>
+     * - verify a method printing a single treasure is not called for the empty one
+     * <p>
+     * - verify the whole file afterward
+     * <p>
+     * - verify printing an empty treasure returns an empty string and verifying the overall formatting in another test
+     * <p>
+     * - etc.
+     * <p>
+     * i opted for verifying the "treasures" section of the output file, assuming i will build a string composed of the
+     * size, mountains, treasures, players sections, and write the whole content at once instead of writing line by
+     * line. It is fine enough, as the file is small enough, but line by line and not keeping the string in memory would
+     * be more appropriate if the simulation size were to grow, or performance issues were to appear.
+     */
+    @Test
+    void skip_empty_treasure_when_printing_treasures() {
+        // GIVEN
+        List<Treasure> treasures = of(
+                new Treasure(1, 0, 2),
+                new Treasure(1, 2, 3),
+                new Treasure(1, 1, 0)
+        );
+
+        // WHEN
+        String formattedTreasures = outputFileWriter.formatTreasures(treasures);
+
+        // THEN
+        assertThat(formattedTreasures).isEqualTo("""
+                T - 1 - 0 - 2
+                T - 1 - 2 - 3""");
     }
 
     private void setupAndVerifyOutputFile(Path outputDirPath, Path outputFilePath) throws IOException {

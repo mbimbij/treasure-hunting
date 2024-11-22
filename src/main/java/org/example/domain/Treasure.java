@@ -40,7 +40,7 @@ public final class Treasure implements CanCollideWith {
         return quantity;
     }
 
-    boolean isEmpty() {
+    public boolean isEmpty() {
         return quantity() <= 0;
     }
 }
