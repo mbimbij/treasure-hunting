@@ -1,4 +1,4 @@
-package org.example;
+package org.example.domain;
 
 import com.speedment.common.mapstream.MapStream;
 import lombok.Getter;

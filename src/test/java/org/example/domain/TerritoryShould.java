@@ -1,4 +1,4 @@
-package org.example;
+package org.example.domain;
 
 import net.jqwik.api.*;
 import org.assertj.core.api.ThrowableAssert;
@@ -9,7 +9,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InOrder;
 
-import java.util.ArrayDeque;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -18,8 +17,8 @@ import static java.util.List.of;
 import static net.jqwik.api.Arbitraries.integers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.example.Command.*;
-import static org.example.Orientation.*;
+import static org.example.domain.Command.*;
+import static org.example.domain.Orientation.*;
 import static org.mockito.Mockito.*;
 
 class TerritoryShould {

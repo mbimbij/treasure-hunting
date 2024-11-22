@@ -1,4 +1,4 @@
-package org.example;
+package org.example.domain;
 
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
