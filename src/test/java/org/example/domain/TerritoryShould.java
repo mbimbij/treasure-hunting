@@ -40,7 +40,7 @@ class TerritoryShould {
             NORTH);
 
     @Property
-    void create_territory_with_specified_size(@ForAll("validPairsOfWidthAndHeight") IntegerPair widthHeightPair) {
+    void create_territory_with_specified_size(@ForAll("validPairsOfWidthAndHeight") Territory.Size widthHeightPair) {
         // GIVEN
         Integer width = widthHeightPair.first();
         Integer height = widthHeightPair.second();
@@ -122,7 +122,7 @@ class TerritoryShould {
     }
 
     @Property
-    void throw_exception_for_invalid_width_or_height(@ForAll("invalidPairsOfWidthAndHeight") IntegerPair pair) {
+    void throw_exception_for_invalid_width_or_height(@ForAll("invalidPairsOfWidthAndHeight") Territory.Size pair) {
         // GIVEN
         Integer width = pair.first();
         Integer height = pair.second();
@@ -408,17 +408,17 @@ class TerritoryShould {
     }
 
     @Provide
-    Arbitrary<IntegerPair> validPairsOfWidthAndHeight() {
+    Arbitrary<Territory.Size> validPairsOfWidthAndHeight() {
         return Combinators.combine(integers(), integers())
                 .filter((integer, integer2) -> integer > 0 && integer2 > 0)
-                .as(IntegerPair::new);
+                .as(Territory.Size::new);
     }
 
     @Provide
-    private Arbitrary<IntegerPair> invalidPairsOfWidthAndHeight() {
+    private Arbitrary<Territory.Size> invalidPairsOfWidthAndHeight() {
         return Combinators.combine(integers(), integers())
                 .filter((integer, integer2) -> integer <= 0 || integer2 <= 0)
-                .as(IntegerPair::new);
+                .as(Territory.Size::new);
     }
 
     /**
@@ -565,9 +565,4 @@ class TerritoryShould {
         }
 
     }
-
-
-}
-
-record IntegerPair(Integer first, Integer second) {
 }

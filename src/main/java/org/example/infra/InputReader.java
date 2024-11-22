@@ -1,6 +1,7 @@
 package org.example.infra;
 
 import lombok.SneakyThrows;
+import org.example.domain.Territory;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -15,8 +16,9 @@ public class InputReader {
         Files.lines(path, StandardCharsets.UTF_8)
                 .forEach(s -> {
                     String[] split = s.split("-");
-                    territoryData.setWidth(Integer.parseInt(split[1].trim()));
-                    territoryData.setHeight(Integer.parseInt(split[2].trim()));
+                    Territory.Size size = new Territory.Size(Integer.parseInt(split[1].trim()),
+                            Integer.parseInt(split[2].trim()));
+                    territoryData.setSize(size);
                 });
         return territoryData;
     }

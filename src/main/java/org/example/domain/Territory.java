@@ -215,4 +215,6 @@ public class Territory {
         return players.stream().anyMatch(Player::hasRemainingCommands);
     }
 
+    public record Size(Integer first, Integer second) {
+    }
 }
