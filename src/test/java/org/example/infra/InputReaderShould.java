@@ -1,9 +1,13 @@
 package org.example.infra;
 
 import org.assertj.core.api.ThrowableAssert;
+import org.example.domain.Mountain;
 import org.example.domain.Territory;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
+import static java.util.List.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -50,5 +54,21 @@ class InputReaderShould {
         assertThatThrownBy(throwingCallable)
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(InputReader.SIZE_ALREADY_DEFINED_ERROR_MESSAGE_FORMAT.formatted(line));
+    }
+
+    @Test
+    void read_mountains() {
+        // GIVEN
+        TerritoryData territoryData = new TerritoryData();
+        territoryData.setSize(new Territory.Size(2, 4));
+
+        // WHEN
+        InputReader.readLine("M - 1 - 0", territoryData);
+        InputReader.readLine("M - 2 - 1", territoryData);
+
+        // THEN
+        List<Mountain> expectedMountains = of(new Mountain(1, 0),
+                new Mountain(2, 1));
+        assertThat(territoryData.getMountains()).isEqualTo(expectedMountains);
     }
 }

@@ -1,6 +1,7 @@
 package org.example.infra;
 
 import lombok.SneakyThrows;
+import org.example.domain.Mountain;
 import org.example.domain.Territory;
 
 import java.nio.charset.StandardCharsets;
@@ -27,6 +28,20 @@ public class InputReader {
     }
 
     public static void readLine(String line, TerritoryData territoryData) {
+        if(line.startsWith("C")){
+            readSize(line, territoryData);
+        }
+        readMountain(line, territoryData);
+    }
+
+    private static void readMountain(String line, TerritoryData territoryData) {
+        String[] split = line.split("-");
+        Mountain mountain = new Mountain(Integer.parseInt(split[1].trim()),
+                Integer.parseInt(split[2].trim()));
+        territoryData.addMountain(mountain);
+    }
+
+    private static void readSize(String line, TerritoryData territoryData) {
         if(territoryData.getSize() != null){
             throw new IllegalArgumentException(SIZE_ALREADY_DEFINED_ERROR_MESSAGE_FORMAT.formatted(line));
         }
