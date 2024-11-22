@@ -15,39 +15,39 @@ public class InputReader {
     static final String SIZE_ALREADY_DEFINED_ERROR_MESSAGE_FORMAT = "Error reading line %s. Size already defined";
 
     @SneakyThrows
-    public static TerritoryData readFile(String pathString) {
-        TerritoryData territoryData = new TerritoryData();
+    public static SimulationData readFile(String pathString) {
+        SimulationData simulationData = new SimulationData();
         Path path = Paths.get(pathString);
 
         try (Stream<String> lines = Files.lines(path, StandardCharsets.UTF_8);) {
             lines.forEach(line -> {
-                readLine(line, territoryData);
+                readLine(line, simulationData);
             });
         }
 
-        return territoryData;
+        return simulationData;
     }
 
-    public static void readLine(String line, TerritoryData territoryData) {
+    public static void readLine(String line, SimulationData simulationData) {
         if (line.startsWith("C")) {
-            readSize(line, territoryData);
+            readSize(line, simulationData);
         } else if (line.startsWith("M")) {
-            readMountain(line, territoryData);
+            readMountain(line, simulationData);
         } else if (line.startsWith("T")) {
-            readTreasure(line, territoryData);
+            readTreasure(line, simulationData);
         } else if (line.startsWith("A")) {
-            readPlayer(line, territoryData);
+            readPlayer(line, simulationData);
         }
     }
 
-    private static void readPlayer(String line, TerritoryData territoryData) {
+    private static void readPlayer(String line, SimulationData simulationData) {
         String[] split = line.split("-");
         String name = split[1].trim();
         Coordinates coordinates = readCoordinates(split[2], split[3]);
         Orientation orientation = readOrientation(split[4]);
         List<Command> commands = readCommands(split[5]);
         Player player = new Player(name, coordinates, orientation, commands);
-        territoryData.addPlayer(player);
+        simulationData.addPlayer(player);
     }
 
     private static Orientation readOrientation(String orientationString) {
@@ -62,27 +62,27 @@ public class InputReader {
                 .toList();
     }
 
-    private static void readTreasure(String line, TerritoryData territoryData) {
+    private static void readTreasure(String line, SimulationData simulationData) {
         String[] split = line.split("-");
         Treasure treasure = new Treasure(readCoordinates(split[1], split[2]),
                 Integer.parseInt(split[3].trim()));
-        territoryData.addTreasure(treasure);
+        simulationData.addTreasure(treasure);
     }
 
-    private static void readSize(String line, TerritoryData territoryData) {
-        if (territoryData.getSize() != null) {
+    private static void readSize(String line, SimulationData simulationData) {
+        if (simulationData.getSize() != null) {
             throw new IllegalArgumentException(SIZE_ALREADY_DEFINED_ERROR_MESSAGE_FORMAT.formatted(line));
         }
         String[] split = line.split("-");
-        Territory.Size size = new Territory.Size(Integer.parseInt(split[1].trim()),
+        Simulation.Size size = new Simulation.Size(Integer.parseInt(split[1].trim()),
                 Integer.parseInt(split[2].trim()));
-        territoryData.setSize(size);
+        simulationData.setSize(size);
     }
 
-    private static void readMountain(String line, TerritoryData territoryData) {
+    private static void readMountain(String line, SimulationData simulationData) {
         String[] split = line.split("-");
         Mountain mountain = new Mountain(readCoordinates(split[1], split[2]));
-        territoryData.addMountain(mountain);
+        simulationData.addMountain(mountain);
     }
 
     private static Coordinates readCoordinates(String weCoordinates, String nsCoordinates) {

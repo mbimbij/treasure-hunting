@@ -22,7 +22,7 @@ import static org.example.domain.Command.*;
 import static org.example.domain.Orientation.*;
 import static org.mockito.Mockito.*;
 
-class TerritoryShould {
+class SimulationShould {
 
     private static final Coordinates COORDINATES_1_1 = new Coordinates(1, 1);
     private static final Coordinates COORDINATES_1_2 = new Coordinates(1, 2);
@@ -41,16 +41,16 @@ class TerritoryShould {
             NORTH);
 
     @Property
-    void create_territory_with_specified_size(@ForAll("validPairsOfWidthAndHeight") Territory.Size size) {
+    void create_simulation_with_specified_size(@ForAll("validPairsOfWidthAndHeight") Simulation.Size size) {
         // WHEN
-        Territory madreDeDios = new Territory(size, emptyList(), emptyList(), emptyList());
+        Simulation madreDeDios = new Simulation(size, emptyList(), emptyList(), emptyList());
 
         // THEN
         assertThat(madreDeDios.getSize()).isEqualTo(size);
     }
 
     @Test
-    void create_territory_with_mountains() {
+    void create_simulation_with_mountains() {
         // GIVEN
         List<Mountain> mountains = of(
                 new Mountain(0, 0),
@@ -59,8 +59,8 @@ class TerritoryShould {
         );
 
         // WHEN
-        Territory.Size size = new Territory.Size(3, 4);
-        Territory madreDeDios = new Territory(size, mountains, emptyList(), emptyList());
+        Simulation.Size size = new Simulation.Size(3, 4);
+        Simulation madreDeDios = new Simulation(size, mountains, emptyList(), emptyList());
 
         // THEN
         assertThat(madreDeDios.getMountains())
@@ -69,7 +69,7 @@ class TerritoryShould {
     }
 
     @Test
-    void create_territory_with_treasures() {
+    void create_simulation_with_treasures() {
         // GIVEN
         List<Treasure> treasures = of(
                 new Treasure(COORDINATES_1_1, 1),
@@ -77,8 +77,8 @@ class TerritoryShould {
         );
 
         // WHEN
-        Territory.Size size = new Territory.Size(3, 4);
-        Territory madreDeDios = new Territory(size, emptyList(), treasures, emptyList());
+        Simulation.Size size = new Simulation.Size(3, 4);
+        Simulation madreDeDios = new Simulation(size, emptyList(), treasures, emptyList());
 
         // THEN
         assertThat(madreDeDios.getTreasures())
@@ -87,7 +87,7 @@ class TerritoryShould {
     }
 
     @Test
-    void create_territory_with_players() {
+    void create_simulation_with_players() {
         // GIVEN
         List<Player> players = of(
                 PLAYER_1,
@@ -95,8 +95,8 @@ class TerritoryShould {
         );
 
         // WHEN
-        Territory.Size size = new Territory.Size(3, 4);
-        Territory madreDeDios = new Territory(size, emptyList(), emptyList(), players);
+        Simulation.Size size = new Simulation.Size(3, 4);
+        Simulation madreDeDios = new Simulation(size, emptyList(), emptyList(), players);
 
         // THEN
         assertThat(madreDeDios.getPlayers())
@@ -105,14 +105,14 @@ class TerritoryShould {
     }
 
     @Property
-    void throw_exception_for_invalid_width_or_height(@ForAll("invalidPairsOfWidthAndHeight") Territory.Size pair) {
+    void throw_exception_for_invalid_width_or_height(@ForAll("invalidPairsOfWidthAndHeight") Simulation.Size pair) {
         // GIVEN
         Integer width = pair.width();
         Integer height = pair.height();
-        String expectedErrorMessage = Territory.INVALID_TERRITORY_SIZE_ERROR_MESSAGE_FORMAT.formatted(width, height);
+        String expectedErrorMessage = Simulation.INVALID_SIMULATION_SIZE_ERROR_MESSAGE_FORMAT.formatted(width, height);
 
         // WHEN
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(new Territory.Size(width, height), emptyList(), emptyList(), emptyList());
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> new Simulation(new Simulation.Size(width, height), emptyList(), emptyList(), emptyList());
 
         // THEN
         assertThatThrownBy(throwingCallable)
@@ -125,11 +125,11 @@ class TerritoryShould {
     @MethodSource
     void throw_exception_if_multiple_players_have_the_same_name(List<Player> players, List<String> duplicatePlayersNames) {
         // GIVEN
-        String expectedErrorMessage = Territory.DUPLICATE_PLAYERS_NAMES_ERROR_MESSAGE_FORMAT
+        String expectedErrorMessage = Simulation.DUPLICATE_PLAYERS_NAMES_ERROR_MESSAGE_FORMAT
                 .formatted(duplicatePlayersNames);
 
         // WHEN
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(new Territory.Size(3, 4), emptyList(), emptyList(), players);
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> new Simulation(new Simulation.Size(3, 4), emptyList(), emptyList(), players);
 
         // THEN
         assertThatThrownBy(throwingCallable)
@@ -171,11 +171,11 @@ class TerritoryShould {
                 new Treasure(0, 3, 2),
                 new Treasure(1, 3, 3)
         );
-        Territory.Size size = new Territory.Size(width, height);
-        Territory territory = new Territory(size, mountains, treasures, players);
+        Simulation.Size size = new Simulation.Size(width, height);
+        Simulation simulation = new Simulation(size, mountains, treasures, players);
 
         // WHEN
-        territory.moveForward(player1);
+        simulation.moveForward(player1);
 
         // THEN
         assertThat(player1.getCoordinates()).isEqualTo(expectedCoordinates);
@@ -187,15 +187,15 @@ class TerritoryShould {
         int width = 1;
         int height = 1;
         Player player = spy(new Player("player", new Coordinates(0, 0), NORTH));
-        Territory.Size size = new Territory.Size(width, height);
-        Territory territory = new Territory(size, emptyList(), emptyList(), of(player));
+        Simulation.Size size = new Simulation.Size(width, height);
+        Simulation simulation = new Simulation(size, emptyList(), emptyList(), of(player));
 
         // WHEN
-        territory.turnLeft(player);
+        simulation.turnLeft(player);
         verify(player).turnLeft();
 
         // AND
-        territory.turnRight(player);
+        simulation.turnRight(player);
         verify(player).turnRight();
     }
 
@@ -222,25 +222,25 @@ class TerritoryShould {
                 // Will be collected once
                 new Treasure(3, 0, 7)
         );
-        Territory.Size size = new Territory.Size(width, height);
+        Simulation.Size size = new Simulation.Size(width, height);
         // Will be collected twice
         // Won't be collected
         // Will be collected once
-        Territory territory = new Territory(size, emptyList(), treasures, of(player));
+        Simulation simulation = new Simulation(size, emptyList(), treasures, of(player));
 
         // WHEN
-        territory.moveForward(player);
-        territory.moveForward(player);
-        territory.moveForward(player);
-        territory.turnRight(player);
-        territory.turnRight(player);
-        territory.moveForward(player);
-        territory.moveForward(player);
-        territory.moveForward(player);
+        simulation.moveForward(player);
+        simulation.moveForward(player);
+        simulation.moveForward(player);
+        simulation.turnRight(player);
+        simulation.turnRight(player);
+        simulation.moveForward(player);
+        simulation.moveForward(player);
+        simulation.moveForward(player);
 
         // THEN
         assertThat(player.getCollectedTreasuresCount()).isEqualTo(3);
-        assertThat(territory.getTreasures()).extracting(Treasure::quantity).isEqualTo(of(1, 0, 6));
+        assertThat(simulation.getTreasures()).extracting(Treasure::quantity).isEqualTo(of(1, 0, 6));
     }
 
     @Test
@@ -251,18 +251,18 @@ class TerritoryShould {
 
         List<Command> commands = of(A, G, D, D, G);
         Player player = new Player("player", new Coordinates(0, 0), NORTH, commands);
-        Territory.Size size = new Territory.Size(width, height);
-        Territory territory = spy(new Territory(size, emptyList(), emptyList(), of(player)));
+        Simulation.Size size = new Simulation.Size(width, height);
+        Simulation simulation = spy(new Simulation(size, emptyList(), emptyList(), of(player)));
 
         // WHEN
-        territory.runSimulation();
+        simulation.runSimulation();
 
         // THEN
-        InOrder inOrder = inOrder(territory);
-        inOrder.verify(territory).moveForward(player);
-        inOrder.verify(territory).turnLeft(player);
-        inOrder.verify(territory, times(2)).turnRight(player);
-        inOrder.verify(territory).turnLeft(player);
+        InOrder inOrder = inOrder(simulation);
+        inOrder.verify(simulation).moveForward(player);
+        inOrder.verify(simulation).turnLeft(player);
+        inOrder.verify(simulation, times(2)).turnRight(player);
+        inOrder.verify(simulation).turnLeft(player);
     }
 
     @Test
@@ -273,22 +273,22 @@ class TerritoryShould {
 
         Player player1 = new Player("player", new Coordinates(0, 0), EAST, of(A, G, D, D, G));
         Player player2 = new Player("player2", new Coordinates(2, 1), WEST, of(D, A, G));
-        Territory.Size size = new Territory.Size(width, height);
-        Territory territory = spy(new Territory(size, emptyList(), emptyList(), of(player1, player2)));
+        Simulation.Size size = new Simulation.Size(width, height);
+        Simulation simulation = spy(new Simulation(size, emptyList(), emptyList(), of(player1, player2)));
 
         // WHEN
-        territory.runSimulation();
+        simulation.runSimulation();
 
         // THEN
-        InOrder inOrder = inOrder(territory);
-        inOrder.verify(territory).moveForward(player1);
-        inOrder.verify(territory).turnRight(player2);
-        inOrder.verify(territory).turnLeft(player1);
-        inOrder.verify(territory).moveForward(player2);
-        inOrder.verify(territory).turnRight(player1);
-        inOrder.verify(territory).turnLeft(player2);
-        inOrder.verify(territory).turnRight(player1);
-        inOrder.verify(territory).turnLeft(player1);
+        InOrder inOrder = inOrder(simulation);
+        inOrder.verify(simulation).moveForward(player1);
+        inOrder.verify(simulation).turnRight(player2);
+        inOrder.verify(simulation).turnLeft(player1);
+        inOrder.verify(simulation).moveForward(player2);
+        inOrder.verify(simulation).turnRight(player1);
+        inOrder.verify(simulation).turnLeft(player2);
+        inOrder.verify(simulation).turnRight(player1);
+        inOrder.verify(simulation).turnLeft(player1);
     }
 
     @Test
@@ -309,14 +309,14 @@ class TerritoryShould {
                 emptyList());
         List<Mountain> mountains = TestDataFactory.mountainsFromInstructions();
         List<Treasure> treasures = TestDataFactory.treasuresFromInstructions();
-        Territory.Size size = new Territory.Size(width, height);
-        Territory territory = new Territory(size, mountains, treasures, of(playerBeforeSimulation));
+        Simulation.Size size = new Simulation.Size(width, height);
+        Simulation simulation = new Simulation(size, mountains, treasures, of(playerBeforeSimulation));
 
         // WHEN
-        territory.runSimulation();
+        simulation.runSimulation();
 
         // THEN
-        assertThat(territory.getPlayers())
+        assertThat(simulation.getPlayers())
                 .singleElement()
                 .satisfies(l ->{
                     assertThat(l).usingRecursiveComparison()
@@ -366,17 +366,17 @@ class TerritoryShould {
     }
 
     @Provide
-    Arbitrary<Territory.Size> validPairsOfWidthAndHeight() {
+    Arbitrary<Simulation.Size> validPairsOfWidthAndHeight() {
         return Combinators.combine(integers(), integers())
                 .filter((integer, integer2) -> integer > 0 && integer2 > 0)
-                .as(Territory.Size::new);
+                .as(Simulation.Size::new);
     }
 
     @Provide
-    private Arbitrary<Territory.Size> invalidPairsOfWidthAndHeight() {
+    private Arbitrary<Simulation.Size> invalidPairsOfWidthAndHeight() {
         return Combinators.combine(integers(), integers())
                 .filter((integer, integer2) -> integer <= 0 || integer2 <= 0)
-                .as(Territory.Size::new);
+                .as(Simulation.Size::new);
     }
 
     /**
@@ -421,11 +421,11 @@ class TerritoryShould {
                                                      List<Player> players) {
             // GIVEN
             List<Coordinates> expectedOverlap = of(COORDINATES_1_1);
-            String expectedErrorMessage = Territory.OVERLAPPING_FEATURES_ERROR_MESSAGE_FORMAT
+            String expectedErrorMessage = Simulation.OVERLAPPING_FEATURES_ERROR_MESSAGE_FORMAT
                     .formatted(expectedOverlap);
 
             // WHEN
-            ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(new Territory.Size(3, 4), mountains, treasures, players);
+            ThrowableAssert.ThrowingCallable throwingCallable = () -> new Simulation(new Simulation.Size(3, 4), mountains, treasures, players);
 
             // THEN
             assertThatThrownBy(throwingCallable)
@@ -464,11 +464,11 @@ class TerritoryShould {
             List<Treasure> treasures = emptyList();
             List<Player> players = emptyList();
 
-            String expectedErrorMessage = Territory.FEATURES_COORDINATES_OUT_OF_BOUND_ERROR_MESSAGE
+            String expectedErrorMessage = Simulation.FEATURES_COORDINATES_OUT_OF_BOUND_ERROR_MESSAGE
                     .formatted(expectedInvalidCoordinates);
 
             // WHEN
-            ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(new Territory.Size(width, height), mountains, treasures, players);
+            ThrowableAssert.ThrowingCallable throwingCallable = () -> new Simulation(new Simulation.Size(width, height), mountains, treasures, players);
 
             // THEN
             assertThatThrownBy(throwingCallable)

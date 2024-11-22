@@ -13,18 +13,19 @@ import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 
 /**
- * Represent 'Madre de Dios' territory. I opted for a noun for the class name and 'Madre de Dios' for the instance.
+ * Represent 'Madre de Dios' simulation. I opted for a noun for the class name and 'Madre de Dios' for the instance.
  * name. "Carte" translates to "Map", and I didn't want to have potential collisions with java.util.Map, so I decided on
  * "Territory".
+ * ETA: switched to "Simulation"
  */
 @Getter
-public class Territory {
-    public static final String OVERLAPPING_FEATURES_ERROR_MESSAGE_FORMAT = "Cannot build territory because of overlapping features at %s";
-    public static final String DUPLICATE_PLAYERS_NAMES_ERROR_MESSAGE_FORMAT = "Cannot build territory because of duplicate players names: %s";
-    public static final String INVALID_TERRITORY_SIZE_ERROR_MESSAGE_FORMAT = "Width and height must be greater than zero but were {%d, %d}";
-    public static final String FEATURES_COORDINATES_OUT_OF_BOUND_ERROR_MESSAGE = "Some features are located outside the territory: %s";
+public class Simulation {
+    public static final String OVERLAPPING_FEATURES_ERROR_MESSAGE_FORMAT = "Cannot build simulation because of overlapping features at %s";
+    public static final String DUPLICATE_PLAYERS_NAMES_ERROR_MESSAGE_FORMAT = "Cannot build simulation because of duplicate players names: %s";
+    public static final String INVALID_SIMULATION_SIZE_ERROR_MESSAGE_FORMAT = "Width and height must be greater than zero but were {%d, %d}";
+    public static final String FEATURES_COORDINATES_OUT_OF_BOUND_ERROR_MESSAGE = "Some features are located outside the simulation: %s";
 
-    // TODO question au PO: min et max pour la largeur et la hauteur de la carte ? Si oui, amha, la validation devrait être sortie de la classe Territory, mais il y a de bons arguments pour le contraire.
+    // TODO question au PO: min et max pour la largeur et la hauteur de la carte ? Si oui, amha, la validation devrait être sortie de la classe Simulation, mais il y a de bons arguments pour le contraire.
     private final Size size;
     // TODO question au PO: min montagnes: 0  1 ? max montagnes: un nombre constant, en entrée de l'application, ou calculé en fonction de la taille de la carte et du nombre de features ?
     private final List<Mountain> mountains;
@@ -33,7 +34,7 @@ public class Territory {
     // TODO question au PO: min joueur: 0 ou 1 ? max joueurs: un nombre constant, en entrée de l'application, ou calculé en
     private final List<Player> players;
 
-    public Territory(Size size, List<Mountain> mountains, List<Treasure> treasures, List<Player> players) {
+    public Simulation(Size size, List<Mountain> mountains, List<Treasure> treasures, List<Player> players) {
         this.size = size;
         this.mountains = mountains;
         this.treasures = treasures;
@@ -70,7 +71,7 @@ public class Territory {
 
     /**
      * At the moment, as the application is simple enough, and for early stages of the project, i decided to place the
-     * have the territory validate itself at construction time for the sake of simplicity and not over-engineer things.
+     * have the simulation validate itself at construction time for the sake of simplicity and not over-engineer things.
      * Also early on, data and validation itself was pretty cohesive
      * <p>
      * As the validation logic and the class itself grows, it might be appropriate to put it in either a Factory or a
@@ -85,7 +86,7 @@ public class Territory {
      * "responsibility" / "reason to change". If time allows, it will be extracted
      */
     private void validate() {
-        validateTerritorySize();
+        validateSimulationSize();
         validateNoOverlappingFeatures();
         validateNoFeatureOutOfBound();
         validateNoDuplicatePlayerName();
@@ -117,9 +118,9 @@ public class Territory {
                || coordinates.northSouth() >= size.height();
     }
 
-    private void validateTerritorySize() {
+    private void validateSimulationSize() {
         if (this.size.width() <= 0 || this.size.height() <= 0) {
-            String message = INVALID_TERRITORY_SIZE_ERROR_MESSAGE_FORMAT.formatted(this.size.width(), this.size.height());
+            String message = INVALID_SIMULATION_SIZE_ERROR_MESSAGE_FORMAT.formatted(this.size.width(), this.size.height());
             throw new IllegalArgumentException(message);
         }
     }

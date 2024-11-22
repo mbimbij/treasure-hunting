@@ -9,8 +9,8 @@ import static org.example.domain.Command.*;
 import static org.example.domain.Orientation.SOUTH;
 
 public class TestDataFactory {
-    public static Territory.Size sizeFromInstructions() {
-        return new Territory.Size(3, 4);
+    public static Simulation.Size sizeFromInstructions() {
+        return new Simulation.Size(3, 4);
     }
 
     public static List<Mountain> mountainsFromInstructions() {

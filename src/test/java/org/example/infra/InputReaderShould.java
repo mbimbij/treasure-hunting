@@ -4,7 +4,7 @@ import org.assertj.core.api.ThrowableAssert;
 import org.example.TestDataFactory;
 import org.example.domain.Coordinates;
 import org.example.domain.Player;
-import org.example.domain.Territory;
+import org.example.domain.Simulation;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -22,38 +22,38 @@ class InputReaderShould {
         String filePath = "src/test/resources/input.txt";
 
         // WHEN
-        TerritoryData territoryData = InputReader.readFile(filePath);
+        SimulationData simulationData = InputReader.readFile(filePath);
 
         // THEN
-        assertThat(territoryData.getSize()).isEqualTo(TestDataFactory.sizeFromInstructions());
-        assertThat(territoryData.getMountains()).isEqualTo(TestDataFactory.mountainsFromInstructions());
-        assertThat(territoryData.getTreasures()).isEqualTo(TestDataFactory.treasuresFromInstructions());
-        assertThat(territoryData.getPlayers()).isEqualTo(of(TestDataFactory.playerLara()));
+        assertThat(simulationData.getSize()).isEqualTo(TestDataFactory.sizeFromInstructions());
+        assertThat(simulationData.getMountains()).isEqualTo(TestDataFactory.mountainsFromInstructions());
+        assertThat(simulationData.getTreasures()).isEqualTo(TestDataFactory.treasuresFromInstructions());
+        assertThat(simulationData.getPlayers()).isEqualTo(of(TestDataFactory.playerLara()));
     }
 
     @Test
-    void read_territory_size() {
+    void read_simulation_size() {
         // GIVEN
-        TerritoryData territoryData = new TerritoryData();
+        SimulationData simulationData = new SimulationData();
 
         // WHEN
-        InputReader.readLine("C - 3 - 4", territoryData);
+        InputReader.readLine("C - 3 - 4", simulationData);
 
         // THEN
-        assertThat(territoryData).extracting(TerritoryData::getSize)
+        assertThat(simulationData).extracting(SimulationData::getSize)
                 .isNotNull()
                 .isEqualTo(TestDataFactory.sizeFromInstructions());
     }
 
     @Test
-    void throw_exception_if_read_territory_size_but_already_defined() {
+    void throw_exception_if_read_simulation_size_but_already_defined() {
         // GIVEN
-        TerritoryData territoryData = new TerritoryData();
-        territoryData.setSize(new Territory.Size(2, 4));
+        SimulationData simulationData = new SimulationData();
+        simulationData.setSize(new Simulation.Size(2, 4));
 
         // WHEN
         String line = "C - 3 - 4";
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> InputReader.readLine(line, territoryData);
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> InputReader.readLine(line, simulationData);
 
         // THEN
         assertThatThrownBy(throwingCallable)
@@ -64,37 +64,37 @@ class InputReaderShould {
     @Test
     void read_mountains() {
         // GIVEN
-        TerritoryData territoryData = new TerritoryData();
+        SimulationData simulationData = new SimulationData();
 
         // WHEN
-        InputReader.readLine("M - 1 - 0", territoryData);
-        InputReader.readLine("M - 2 - 1", territoryData);
+        InputReader.readLine("M - 1 - 0", simulationData);
+        InputReader.readLine("M - 2 - 1", simulationData);
 
         // THEN
-        assertThat(territoryData.getMountains()).isEqualTo(TestDataFactory.mountainsFromInstructions());
+        assertThat(simulationData.getMountains()).isEqualTo(TestDataFactory.mountainsFromInstructions());
     }
 
     @Test
     void read_treasures() {
         // GIVEN
-        TerritoryData territoryData = new TerritoryData();
+        SimulationData simulationData = new SimulationData();
 
         // WHEN
-        InputReader.readLine("T - 0 - 3 - 2", territoryData);
-        InputReader.readLine("T - 1 - 3 - 3", territoryData);
+        InputReader.readLine("T - 0 - 3 - 2", simulationData);
+        InputReader.readLine("T - 1 - 3 - 3", simulationData);
 
         // THEN
-        assertThat(territoryData.getTreasures()).isEqualTo(TestDataFactory.treasuresFromInstructions());
+        assertThat(simulationData.getTreasures()).isEqualTo(TestDataFactory.treasuresFromInstructions());
     }
 
     @Test
     void read_adventurers() {
         // GIVEN
-        TerritoryData territoryData = new TerritoryData();
+        SimulationData simulationData = new SimulationData();
 
         // WHEN
-        InputReader.readLine("A - Lara - 1 - 1 - S - AADADAGGA", territoryData);
-        InputReader.readLine("A - Jones - 2 - 2 - N - ADGGAGDDGA", territoryData);
+        InputReader.readLine("A - Lara - 1 - 1 - S - AADADAGGA", simulationData);
+        InputReader.readLine("A - Jones - 2 - 2 - N - ADGGAGDDGA", simulationData);
 
         // THEN
         Player lara = TestDataFactory.playerLara();
@@ -102,7 +102,7 @@ class InputReaderShould {
                 new Coordinates(2, 2),
                 NORTH,
                 of(A, D, G, G, A, G, D, D, G, A));
-        assertThat(territoryData.getPlayers())
+        assertThat(simulationData.getPlayers())
                 .usingRecursiveFieldByFieldElementComparator()
                 .isEqualTo(of(lara, jones));
     }
@@ -110,18 +110,18 @@ class InputReaderShould {
     @Test
     void ignore_lines_starting_with_hash() {
         // GIVEN
-        TerritoryData territoryData = new TerritoryData();
+        SimulationData simulationData = new SimulationData();
 
         // WHEN
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> InputReader.readLine("# Comment", territoryData);
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> InputReader.readLine("# Comment", simulationData);
 
         // THEN
         assertThatCode(throwingCallable)
                 .doesNotThrowAnyException();
-        assertThat(territoryData.getSize()).isNull();
-        assertThat(territoryData.getMountains()).isEmpty();
-        assertThat(territoryData.getTreasures()).isEmpty();
-        assertThat(territoryData.getPlayers()).isEmpty();
+        assertThat(simulationData.getSize()).isNull();
+        assertThat(simulationData.getMountains()).isEmpty();
+        assertThat(simulationData.getTreasures()).isEmpty();
+        assertThat(simulationData.getPlayers()).isEmpty();
     }
 
     /**
@@ -139,17 +139,17 @@ class InputReaderShould {
     })
     void ignore_lines_starting_with_anything_else(String line) {
         // GIVEN
-        TerritoryData territoryData = new TerritoryData();
+        SimulationData simulationData = new SimulationData();
 
         // WHEN
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> InputReader.readLine(line, territoryData);
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> InputReader.readLine(line, simulationData);
 
         // THEN
         assertThatCode(throwingCallable)
                 .doesNotThrowAnyException();
-        assertThat(territoryData.getSize()).isNull();
-        assertThat(territoryData.getMountains()).isEmpty();
-        assertThat(territoryData.getTreasures()).isEmpty();
-        assertThat(territoryData.getPlayers()).isEmpty();
+        assertThat(simulationData.getSize()).isNull();
+        assertThat(simulationData.getMountains()).isEmpty();
+        assertThat(simulationData.getTreasures()).isEmpty();
+        assertThat(simulationData.getPlayers()).isEmpty();
     }
 }

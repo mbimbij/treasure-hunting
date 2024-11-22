@@ -3,7 +3,7 @@ package org.example.infra;
 import lombok.SneakyThrows;
 import org.example.domain.Mountain;
 import org.example.domain.Player;
-import org.example.domain.Territory;
+import org.example.domain.Simulation;
 import org.example.domain.Treasure;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,20 +14,20 @@ import static java.util.List.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.example.TestDataFactory.*;
 
-class TerritoryFormatterShould {
+class SimulationFormatterShould {
 
-    private TerritoryFormatter formatter;
+    private SimulationFormatter formatter;
 
     @BeforeEach
     void setUp() {
-        formatter = new TerritoryFormatter();
+        formatter = new SimulationFormatter();
     }
 
     @SneakyThrows
     @Test
     void format_entire_simulation_results() {
         // GIVEN a setup similar to the instructions, BUT without player and treasure overlap AND an empty treasure chest
-        Territory territory = new Territory(sizeFromInstructions(),
+        Simulation simulation = new Simulation(sizeFromInstructions(),
                 mountainsFromInstructions(),
                 of(new Treasure(0, 3, 0),
                         new Treasure(1, 3, 3)
@@ -35,10 +35,10 @@ class TerritoryFormatterShould {
                 of(playerLara()));
 
         // WHEN
-        String formattedTerritory = formatter.formatTerritory(territory);
+        String formattedSimulation = formatter.formatSimulation(simulation);
 
         // THEN
-        assertThat(formattedTerritory).isEqualTo("""
+        assertThat(formattedSimulation).isEqualTo("""
                 C - 3 - 4
                 M - 1 - 0
                 M - 2 - 1
@@ -50,7 +50,7 @@ class TerritoryFormatterShould {
     @Test
     void format_simulation_size_appropriately() {
         // GIVEN
-        Territory.Size size = sizeFromInstructions();
+        Simulation.Size size = sizeFromInstructions();
 
         // WHEN
         String formattedSize = formatter.formatSize(size);

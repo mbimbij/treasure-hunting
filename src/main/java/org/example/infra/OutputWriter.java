@@ -10,12 +10,12 @@ import java.nio.file.Paths;
 
 public class OutputWriter {
     @SneakyThrows
-    public static void writeToFile(String formatterTerritory, String pathString) {
+    public static void writeToFile(String formatterSimulation, String pathString) {
         System.out.printf("printing the simulation results to %s%n", pathString);
-        System.out.println(formatterTerritory);
+        System.out.println(formatterSimulation);
         Path path = Paths.get(pathString);
         setupAndVerifyOutputFile(path);
-        Files.writeString(path, formatterTerritory, StandardCharsets.UTF_8);
+        Files.writeString(path, formatterSimulation, StandardCharsets.UTF_8);
     }
     private static void setupAndVerifyOutputFile(Path path) throws IOException {
         Files.deleteIfExists(path);

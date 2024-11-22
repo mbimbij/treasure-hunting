@@ -2,7 +2,7 @@ package org.example.infra;
 
 import org.example.domain.Mountain;
 import org.example.domain.Player;
-import org.example.domain.Territory;
+import org.example.domain.Simulation;
 import org.example.domain.Treasure;
 
 import java.io.PrintWriter;
@@ -10,11 +10,11 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TerritoryFormatter {
+public class SimulationFormatter {
 
     private final String newLine = System.lineSeparator();
 
-    public String formatSize(Territory.Size size) {
+    public String formatSize(Simulation.Size size) {
         return "C - %d - %d".formatted(size.width(), size.height());
     }
 
@@ -49,13 +49,13 @@ public class TerritoryFormatter {
         );
     }
 
-    public String formatTerritory(Territory territory) {
+    public String formatSimulation(Simulation simulation) {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
-        printWriter.println(formatSize(new Territory.Size(territory.getWidth(), territory.getHeight())));
-        printWriter.println(formatMountains(territory.getMountains()));
-        printWriter.println(formatTreasures(territory.getTreasures()));
-        printWriter.println(formatPlayers(territory.getPlayers()));
+        printWriter.println(formatSize(new Simulation.Size(simulation.getWidth(), simulation.getHeight())));
+        printWriter.println(formatMountains(simulation.getMountains()));
+        printWriter.println(formatTreasures(simulation.getTreasures()));
+        printWriter.println(formatPlayers(simulation.getPlayers()));
         return stringWriter.toString();
     }
 

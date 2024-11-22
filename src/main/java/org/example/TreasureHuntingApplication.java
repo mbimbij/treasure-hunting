@@ -1,10 +1,10 @@
 package org.example;
 
-import org.example.domain.Territory;
+import org.example.domain.Simulation;
 import org.example.infra.InputReader;
 import org.example.infra.OutputWriter;
-import org.example.infra.TerritoryData;
-import org.example.infra.TerritoryFormatter;
+import org.example.infra.SimulationData;
+import org.example.infra.SimulationFormatter;
 
 public class TreasureHuntingApplication {
     public static void main(String[] args) {
@@ -16,13 +16,13 @@ public class TreasureHuntingApplication {
     }
 
     public static void runSimulation(String inputFilePath, String outputFilePath) {
-        TerritoryData territoryData = InputReader.readFile(inputFilePath);
-        Territory territory = new Territory(territoryData.getSize(),
-                territoryData.getMountains(),
-                territoryData.getTreasures(),
-                territoryData.getPlayers());
-        territory.runSimulation();
-        String formattedTerritory = new TerritoryFormatter().formatTerritory(territory);
-        OutputWriter.writeToFile(formattedTerritory, outputFilePath);
+        SimulationData simulationData = InputReader.readFile(inputFilePath);
+        Simulation simulation = new Simulation(simulationData.getSize(),
+                simulationData.getMountains(),
+                simulationData.getTreasures(),
+                simulationData.getPlayers());
+        simulation.runSimulation();
+        String formatted = new SimulationFormatter().formatSimulation(simulation);
+        OutputWriter.writeToFile(formatted, outputFilePath);
     }
 }
