@@ -36,23 +36,36 @@ public class InputReader {
         } else if (line.startsWith("T")) {
             readTreasure(line, territoryData);
         } else {
-            String[] split = line.split("-");
-            String name = split[1].trim();
-            Coordinates coordinates = new Coordinates(Integer.parseInt(split[2].trim()),
-                    Integer.parseInt(split[3].trim()));
-            OrientationInput orientationInput = OrientationInput.valueOf(split[4].trim());
-            Orientation orientation = orientationInput.toDomainValue();
-            String[] commandsString = split[5].trim().split("");
-            List<Command> commands = Arrays.stream(commandsString).map(Command::valueOf).toList();
-            Player player = new Player(name, coordinates, orientation,commands);
-            territoryData.addPlayer(player);
+            readPlayer(line, territoryData);
         }
+    }
+
+    private static void readPlayer(String line, TerritoryData territoryData) {
+        String[] split = line.split("-");
+        String name = split[1].trim();
+        Coordinates coordinates = readCoordinates(split[2], split[3]);
+        Orientation orientation = readOrientation(split[4]);
+        List<Command> commands = readCommands(split[5]);
+        Player player = new Player(name, coordinates, orientation, commands);
+        territoryData.addPlayer(player);
+    }
+
+    private static Orientation readOrientation(String orientationString) {
+        OrientationInput orientationInput = OrientationInput.valueOf(orientationString.trim());
+        Orientation orientation = orientationInput.toDomainValue();
+        return orientation;
+    }
+
+    private static List<Command> readCommands(String commandsString) {
+        String[] commandsStrings = commandsString.trim().split("");
+        return Arrays.stream(commandsStrings)
+                .map(Command::valueOf)
+                .toList();
     }
 
     private static void readTreasure(String line, TerritoryData territoryData) {
         String[] split = line.split("-");
-        Treasure treasure = new Treasure(Integer.parseInt(split[1].trim()),
-                Integer.parseInt(split[2].trim()),
+        Treasure treasure = new Treasure(readCoordinates(split[1], split[2]),
                 Integer.parseInt(split[3].trim()));
         territoryData.addTreasure(treasure);
     }
@@ -69,8 +82,12 @@ public class InputReader {
 
     private static void readMountain(String line, TerritoryData territoryData) {
         String[] split = line.split("-");
-        Mountain mountain = new Mountain(Integer.parseInt(split[1].trim()),
-                Integer.parseInt(split[2].trim()));
+        Mountain mountain = new Mountain(readCoordinates(split[1], split[2]));
         territoryData.addMountain(mountain);
+    }
+
+    private static Coordinates readCoordinates(String weCoordinates, String nsCoordinates) {
+        return new Coordinates(Integer.parseInt(weCoordinates.trim()),
+                Integer.parseInt(nsCoordinates.trim()));
     }
 }
