@@ -2,7 +2,9 @@ package org.example.infra;
 
 import org.assertj.core.api.ThrowableAssert;
 import org.example.TestDataFactory;
-import org.example.domain.*;
+import org.example.domain.Coordinates;
+import org.example.domain.Player;
+import org.example.domain.Territory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;

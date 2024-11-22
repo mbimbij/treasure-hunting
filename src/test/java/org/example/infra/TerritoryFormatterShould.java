@@ -1,20 +1,17 @@
 package org.example.infra;
 
 import lombok.SneakyThrows;
-import org.example.domain.*;
+import org.example.domain.Mountain;
+import org.example.domain.Player;
+import org.example.domain.Territory;
+import org.example.domain.Treasure;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import static java.util.List.of;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assumptions.assumeThat;
 import static org.example.TestDataFactory.*;
 
 class TerritoryFormatterShould {

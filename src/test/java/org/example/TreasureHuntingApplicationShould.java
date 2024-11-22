@@ -1,21 +1,14 @@
 package org.example;
 
 import lombok.SneakyThrows;
-import org.example.domain.Territory;
-import org.example.infra.InputReader;
-import org.example.infra.OutputWriter;
-import org.example.infra.TerritoryData;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static java.util.List.of;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assumptions.assumeThat;
 
 class TreasureHuntingApplicationShould {
 

@@ -6,15 +6,10 @@ import org.example.infra.OutputWriter;
 import org.example.infra.TerritoryData;
 import org.example.infra.TerritoryFormatter;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 public class TreasureHuntingApplication {
     public static void main(String[] args) {
-        if (args.length != 1) {
-            System.err.println("Please provide 2 arguments input as a single argument");
+        if (args.length != 2) {
+            System.err.println("Please provide 2 arguments: input and output files");
             System.exit(1);
         }
         runSimulation(args[0], args[1]);

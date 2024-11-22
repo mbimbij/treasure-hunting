@@ -1,6 +1,9 @@
 package org.example.infra;
 
-import org.example.domain.*;
+import org.example.domain.Mountain;
+import org.example.domain.Player;
+import org.example.domain.Territory;
+import org.example.domain.Treasure;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
