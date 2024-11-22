@@ -3,6 +3,7 @@ package org.example.infra;
 import lombok.SneakyThrows;
 import org.example.domain.Mountain;
 import org.example.domain.Territory;
+import org.example.domain.Treasure;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -72,7 +73,7 @@ class OutputFileWriterShould {
     }
 
     @Test
-    void format_mountains_appropriately() {
+    void format_mountain_appropriately() {
         // GIVEN
         Mountain mountain = new Mountain(1, 0);
 
@@ -81,6 +82,18 @@ class OutputFileWriterShould {
 
         // THEN
         assertThat(formattedSize).isEqualTo("M - 1 - 0");
+    }
+
+    @Test
+    void format_treasure_appropriately() {
+        // GIVEN
+        Treasure treasure = new Treasure(1, 0, 2);
+
+        // WHEN
+        String formattedSize = outputFileWriter.formatTreasure(treasure);
+
+        // THEN
+        assertThat(formattedSize).isEqualTo("T - 1 - 0 - 2");
     }
 
     private void setupAndVerifyOutputFile(Path outputDirPath, Path outputFilePath) throws IOException {
