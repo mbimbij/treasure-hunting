@@ -27,9 +27,7 @@ class TerritoryFormatterShould {
     @Test
     void format_entire_simulation_results() {
         // GIVEN a setup similar to the instructions, BUT without player and treasure overlap AND an empty treasure chest
-        Territory.Size size = sizeFromInstructions();
-        Territory territory = new Territory(size.width(),
-                size.height(),
+        Territory territory = new Territory(sizeFromInstructions(),
                 mountainsFromInstructions(),
                 of(new Treasure(0, 3, 0),
                         new Treasure(1, 3, 3)

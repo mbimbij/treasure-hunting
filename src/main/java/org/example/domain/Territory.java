@@ -27,6 +27,7 @@ public class Territory {
     // TODO question au PO: min et max pour la largeur et la hauteur de la carte ? Si oui, amha, la validation devrait être sortie de la classe Territory, mais il y a de bons arguments pour le contraire.
     private final int width;
     private final int height;
+    private final Size size;
     // TODO question au PO: min montagnes: 0  1 ? max montagnes: un nombre constant, en entrée de l'application, ou calculé en fonction de la taille de la carte et du nombre de features ?
     private final List<Mountain> mountains;
     // TODO question au PO: min trésors: 0 ou 1 ? max trésors: un nombre constant, en entrée de l'application, ou calculé en
@@ -34,20 +35,10 @@ public class Territory {
     // TODO question au PO: min joueur: 0 ou 1 ? max joueurs: un nombre constant, en entrée de l'application, ou calculé en
     private final List<Player> players;
 
-    /**
-     * // TODO Introduce a builder maybe ? The desire to reuse a Territory with same size, moutains, treasures, but
-     * sometimes different players in multiple tests cases calls for some sort of builder, and calling the validation
-     * logic on "build()" or some "startSimulation() method"
-     *
-     * @param width
-     * @param height
-     * @param mountains
-     * @param treasures
-     * @param players
-     */
-    public Territory(int width, int height, List<Mountain> mountains, List<Treasure> treasures, List<Player> players) {
-        this.width = width;
-        this.height = height;
+    public Territory(Size size, List<Mountain> mountains, List<Treasure> treasures, List<Player> players) {
+        this.size = size;
+        this.width = this.size.width;
+        this.height = this.size.height;
         this.mountains = mountains;
         this.treasures = treasures;
         this.players = players;
@@ -117,14 +108,14 @@ public class Territory {
      */
     private boolean isOutOfBound(Coordinates coordinates) {
         return coordinates.westEast() < 0
-               || coordinates.westEast() >= width
+               || coordinates.westEast() >= size.width()
                || coordinates.northSouth() < 0
-               || coordinates.northSouth() >= height;
+               || coordinates.northSouth() >= size.height();
     }
 
     private void validateTerritorySize() {
-        if (this.width <= 0 || this.height <= 0) {
-            String message = INVALID_TERRITORY_SIZE_ERROR_MESSAGE_FORMAT.formatted(width, height);
+        if (this.size.width() <= 0 || this.size.height() <= 0) {
+            String message = INVALID_TERRITORY_SIZE_ERROR_MESSAGE_FORMAT.formatted(this.size.width(), this.size.height());
             throw new IllegalArgumentException(message);
         }
     }

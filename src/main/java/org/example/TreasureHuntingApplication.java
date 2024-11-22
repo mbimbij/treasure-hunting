@@ -17,9 +17,7 @@ public class TreasureHuntingApplication {
 
     public static void runSimulation(String inputFilePath, String outputFilePath) {
         TerritoryData territoryData = InputReader.readFile(inputFilePath);
-        Territory.Size size = territoryData.getSize();
-        Territory territory = new Territory(size.width(),
-                size.height(),
+        Territory territory = new Territory(territoryData.getSize(),
                 territoryData.getMountains(),
                 territoryData.getTreasures(),
                 territoryData.getPlayers());

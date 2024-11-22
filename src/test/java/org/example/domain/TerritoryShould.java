@@ -41,21 +41,12 @@ class TerritoryShould {
             NORTH);
 
     @Property
-    void create_territory_with_specified_size(@ForAll("validPairsOfWidthAndHeight") Territory.Size widthHeightPair) {
-        // GIVEN
-        Integer width = widthHeightPair.width();
-        Integer height = widthHeightPair.height();
-
+    void create_territory_with_specified_size(@ForAll("validPairsOfWidthAndHeight") Territory.Size size) {
         // WHEN
-        Territory madreDeDios = new Territory(width,
-                height,
-                emptyList(),
-                emptyList(),
-                emptyList());
+        Territory madreDeDios = new Territory(size, emptyList(), emptyList(), emptyList());
 
         // THEN
-        assertThat(madreDeDios.getWidth()).isEqualTo(width);
-        assertThat(madreDeDios.getHeight()).isEqualTo(height);
+        assertThat(madreDeDios.getSize()).isEqualTo(size);
     }
 
     @Test
@@ -68,11 +59,8 @@ class TerritoryShould {
         );
 
         // WHEN
-        Territory madreDeDios = new Territory(3,
-                4,
-                mountains,
-                emptyList(),
-                emptyList());
+        Territory.Size size = new Territory.Size(3, 4);
+        Territory madreDeDios = new Territory(size, mountains, emptyList(), emptyList());
 
         // THEN
         assertThat(madreDeDios.getMountains())
@@ -89,11 +77,8 @@ class TerritoryShould {
         );
 
         // WHEN
-        Territory madreDeDios = new Territory(3,
-                4,
-                emptyList(),
-                treasures,
-                emptyList());
+        Territory.Size size = new Territory.Size(3, 4);
+        Territory madreDeDios = new Territory(size, emptyList(), treasures, emptyList());
 
         // THEN
         assertThat(madreDeDios.getTreasures())
@@ -110,11 +95,8 @@ class TerritoryShould {
         );
 
         // WHEN
-        Territory madreDeDios = new Territory(3,
-                4,
-                emptyList(),
-                emptyList(),
-                players);
+        Territory.Size size = new Territory.Size(3, 4);
+        Territory madreDeDios = new Territory(size, emptyList(), emptyList(), players);
 
         // THEN
         assertThat(madreDeDios.getPlayers())
@@ -130,11 +112,7 @@ class TerritoryShould {
         String expectedErrorMessage = Territory.INVALID_TERRITORY_SIZE_ERROR_MESSAGE_FORMAT.formatted(width, height);
 
         // WHEN
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(width,
-                height,
-                emptyList(),
-                emptyList(),
-                emptyList());
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(new Territory.Size(width, height), emptyList(), emptyList(), emptyList());
 
         // THEN
         assertThatThrownBy(throwingCallable)
@@ -151,11 +129,7 @@ class TerritoryShould {
                 .formatted(duplicatePlayersNames);
 
         // WHEN
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(3,
-                4,
-                emptyList(),
-                emptyList(),
-                players);
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(new Territory.Size(3, 4), emptyList(), emptyList(), players);
 
         // THEN
         assertThatThrownBy(throwingCallable)
@@ -189,17 +163,16 @@ class TerritoryShould {
         int height = 4;
         Player player2 = new Player("p2", new Coordinates(2, 2), NORTH);
         List<Player> players = of(player1, player2);
-        Territory territory = new Territory(width,
-                height,
-                of(new Mountain(1, 0),
-                        new Mountain(2, 1),
-                        new Mountain(1, 2)
-                ),
-                of(
-                        new Treasure(0, 3, 2),
-                        new Treasure(1, 3, 3)
-                ),
-                players);
+        List<Mountain> mountains = of(new Mountain(1, 0),
+                new Mountain(2, 1),
+                new Mountain(1, 2)
+        );
+        List<Treasure> treasures = of(
+                new Treasure(0, 3, 2),
+                new Treasure(1, 3, 3)
+        );
+        Territory.Size size = new Territory.Size(width, height);
+        Territory territory = new Territory(size, mountains, treasures, players);
 
         // WHEN
         territory.moveForward(player1);
@@ -214,11 +187,8 @@ class TerritoryShould {
         int width = 1;
         int height = 1;
         Player player = spy(new Player("player", new Coordinates(0, 0), NORTH));
-        Territory territory = new Territory(width,
-                height,
-                emptyList(),
-                emptyList(),
-                of(player));
+        Territory.Size size = new Territory.Size(width, height);
+        Territory territory = new Territory(size, emptyList(), emptyList(), of(player));
 
         // WHEN
         territory.turnLeft(player);
@@ -244,18 +214,19 @@ class TerritoryShould {
         int width = 4;
         int height = 1;
         Player player = new Player("player", new Coordinates(0, 0), EAST);
-        Territory territory = new Territory(width,
-                height,
-                emptyList(),
-                of(
-                        // Will be collected twice
-                        new Treasure(1, 0, 3),
-                        // Won't be collected
-                        new Treasure(2, 0, 0),
-                        // Will be collected once
-                        new Treasure(3, 0, 7)
-                ),
-                of(player));
+        List<Treasure> treasures = of(
+                // Will be collected twice
+                new Treasure(1, 0, 3),
+                // Won't be collected
+                new Treasure(2, 0, 0),
+                // Will be collected once
+                new Treasure(3, 0, 7)
+        );
+        Territory.Size size = new Territory.Size(width, height);
+        // Will be collected twice
+        // Won't be collected
+        // Will be collected once
+        Territory territory = new Territory(size, emptyList(), treasures, of(player));
 
         // WHEN
         territory.moveForward(player);
@@ -280,11 +251,8 @@ class TerritoryShould {
 
         List<Command> commands = of(A, G, D, D, G);
         Player player = new Player("player", new Coordinates(0, 0), NORTH, commands);
-        Territory territory = spy(new Territory(width,
-                height,
-                emptyList(),
-                emptyList(),
-                of(player)));
+        Territory.Size size = new Territory.Size(width, height);
+        Territory territory = spy(new Territory(size, emptyList(), emptyList(), of(player)));
 
         // WHEN
         territory.runSimulation();
@@ -305,11 +273,8 @@ class TerritoryShould {
 
         Player player1 = new Player("player", new Coordinates(0, 0), EAST, of(A, G, D, D, G));
         Player player2 = new Player("player2", new Coordinates(2, 1), WEST, of(D, A, G));
-        Territory territory = spy(new Territory(width,
-                height,
-                emptyList(),
-                emptyList(),
-                of(player1, player2)));
+        Territory.Size size = new Territory.Size(width, height);
+        Territory territory = spy(new Territory(size, emptyList(), emptyList(), of(player1, player2)));
 
         // WHEN
         territory.runSimulation();
@@ -344,11 +309,8 @@ class TerritoryShould {
                 emptyList());
         List<Mountain> mountains = TestDataFactory.mountainsFromInstructions();
         List<Treasure> treasures = TestDataFactory.treasuresFromInstructions();
-        Territory territory = new Territory(width,
-                height,
-                mountains,
-                treasures,
-                of(playerBeforeSimulation));
+        Territory.Size size = new Territory.Size(width, height);
+        Territory territory = new Territory(size, mountains, treasures, of(playerBeforeSimulation));
 
         // WHEN
         territory.runSimulation();
@@ -463,11 +425,7 @@ class TerritoryShould {
                     .formatted(expectedOverlap);
 
             // WHEN
-            ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(3,
-                    4,
-                    mountains,
-                    treasures,
-                    players);
+            ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(new Territory.Size(3, 4), mountains, treasures, players);
 
             // THEN
             assertThatThrownBy(throwingCallable)
@@ -510,11 +468,7 @@ class TerritoryShould {
                     .formatted(expectedInvalidCoordinates);
 
             // WHEN
-            ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(width,
-                    height,
-                    mountains,
-                    treasures,
-                    players);
+            ThrowableAssert.ThrowingCallable throwingCallable = () -> new Territory(new Territory.Size(width, height), mountains, treasures, players);
 
             // THEN
             assertThatThrownBy(throwingCallable)
