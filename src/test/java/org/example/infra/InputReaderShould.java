@@ -1,9 +1,7 @@
 package org.example.infra;
 
 import org.assertj.core.api.ThrowableAssert;
-import org.example.domain.Mountain;
-import org.example.domain.Territory;
-import org.example.domain.Treasure;
+import org.example.domain.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -11,6 +9,9 @@ import java.util.List;
 import static java.util.List.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.example.domain.Command.*;
+import static org.example.domain.Orientation.NORTH;
+import static org.example.domain.Orientation.SOUTH;
 
 class InputReaderShould {
 
@@ -85,5 +86,29 @@ class InputReaderShould {
         List<Treasure> expectedTreasures = of(new Treasure(0, 3, 2),
                 new Treasure(1, 3, 3));
         assertThat(territoryData.getTreasures()).isEqualTo(expectedTreasures);
+    }
+
+    @Test
+    void read_adventurers() {
+        // GIVEN
+        TerritoryData territoryData = new TerritoryData();
+
+        // WHEN
+        InputReader.readLine("A - Lara - 1 - 1 - S - AADADAGGA", territoryData);
+        InputReader.readLine("A - Jones - 2 - 2 - N - ADGGAGDDGA", territoryData);
+
+        // THEN
+        Player lara = new Player("Lara",
+                new Coordinates(1, 1),
+                SOUTH,
+                of(A, A, D, A, D, A, G, G, A));
+        Player jones = new Player("Jones",
+                new Coordinates(2, 2),
+                NORTH,
+                of(A, D, G, G, A, G, D, D, G, A));
+        List<Player> expectedPlayers = of(lara, jones);
+        assertThat(territoryData.getPlayers())
+                .usingRecursiveFieldByFieldElementComparator()
+                .isEqualTo(expectedPlayers);
     }
 }

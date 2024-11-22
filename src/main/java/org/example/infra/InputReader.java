@@ -1,14 +1,14 @@
 package org.example.infra;
 
 import lombok.SneakyThrows;
-import org.example.domain.Mountain;
-import org.example.domain.Territory;
-import org.example.domain.Treasure;
+import org.example.domain.*;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class InputReader {
@@ -33,13 +33,28 @@ public class InputReader {
             readSize(line, territoryData);
         } else if (line.startsWith("M")) {
             readMountain(line, territoryData);
+        } else if (line.startsWith("T")) {
+            readTreasure(line, territoryData);
         } else {
             String[] split = line.split("-");
-            Treasure treasure = new Treasure(Integer.parseInt(split[1].trim()),
-                    Integer.parseInt(split[2].trim()),
+            String name = split[1].trim();
+            Coordinates coordinates = new Coordinates(Integer.parseInt(split[2].trim()),
                     Integer.parseInt(split[3].trim()));
-            territoryData.addTreasure(treasure);
+            OrientationInput orientationInput = OrientationInput.valueOf(split[4].trim());
+            Orientation orientation = orientationInput.toDomainValue();
+            String[] commandsString = split[5].trim().split("");
+            List<Command> commands = Arrays.stream(commandsString).map(Command::valueOf).toList();
+            Player player = new Player(name, coordinates, orientation,commands);
+            territoryData.addPlayer(player);
         }
+    }
+
+    private static void readTreasure(String line, TerritoryData territoryData) {
+        String[] split = line.split("-");
+        Treasure treasure = new Treasure(Integer.parseInt(split[1].trim()),
+                Integer.parseInt(split[2].trim()),
+                Integer.parseInt(split[3].trim()));
+        territoryData.addTreasure(treasure);
     }
 
     private static void readSize(String line, TerritoryData territoryData) {

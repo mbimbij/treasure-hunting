@@ -14,7 +14,7 @@ public class TerritoryData {
     private Territory.Size size;
     private List<Mountain> mountains = new ArrayList<>();
     private List<Treasure> treasures = new ArrayList<>();
-    private List<Player> players;
+    private List<Player> players = new ArrayList<>();
 
     public void addMountain(Mountain mountain) {
         this.mountains.add(mountain);
