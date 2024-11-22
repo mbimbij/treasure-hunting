@@ -3,6 +3,7 @@ package org.example.infra;
 import org.assertj.core.api.ThrowableAssert;
 import org.example.domain.Mountain;
 import org.example.domain.Territory;
+import org.example.domain.Treasure;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -60,7 +61,6 @@ class InputReaderShould {
     void read_mountains() {
         // GIVEN
         TerritoryData territoryData = new TerritoryData();
-        territoryData.setSize(new Territory.Size(2, 4));
 
         // WHEN
         InputReader.readLine("M - 1 - 0", territoryData);
@@ -70,5 +70,20 @@ class InputReaderShould {
         List<Mountain> expectedMountains = of(new Mountain(1, 0),
                 new Mountain(2, 1));
         assertThat(territoryData.getMountains()).isEqualTo(expectedMountains);
+    }
+
+    @Test
+    void read_treasures() {
+        // GIVEN
+        TerritoryData territoryData = new TerritoryData();
+
+        // WHEN
+        InputReader.readLine("T - 0 - 3 - 2", territoryData);
+        InputReader.readLine("T - 1 - 3 - 3", territoryData);
+
+        // THEN
+        List<Treasure> expectedTreasures = of(new Treasure(0, 3, 2),
+                new Treasure(1, 3, 3));
+        assertThat(territoryData.getTreasures()).isEqualTo(expectedTreasures);
     }
 }

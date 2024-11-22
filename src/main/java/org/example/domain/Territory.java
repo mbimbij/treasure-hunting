@@ -35,8 +35,9 @@ public class Territory {
     private final List<Player> players;
 
     /**
-     * // TODO Introduce a builder maybe ? The desire to use the same Territory in multiple tests cases calls for some
-     * sort of builder, and calling the validation logic on "build()" or some "startSimulation() method"
+     * // TODO Introduce a builder maybe ? The desire to reuse a Territory with same size, moutains, treasures, but
+     * sometimes different players in multiple tests cases calls for some sort of builder, and calling the validation
+     * logic on "build()" or some "startSimulation() method"
      *
      * @param width
      * @param height
@@ -73,9 +74,17 @@ public class Territory {
     }
 
     /**
-     * As the validation logic grows, it might be appropriate to put it in either a factory or a Validator. Especially
-     * considering the possibility of validating min and max values for width, height, number of mountains, treasures,
-     * players. Or considering even more complex validation logic and creation logic, like procedural generation.
+     * At the moment, as the application is simple enough, and for early stages of the project, i decided to place the
+     * have the territory validate itself at construction time for the sake of simplicity and not over-engineer things. Also early on, data
+     * and validation itself was pretty cohesive
+     * <p>
+     * As the validation logic and the class itself grows, it might be appropriate to put it in either a Factory or a
+     * Validator, in order to 1) Prevent bloating, 2) enforce separation of concerns between validating simulation
+     * parameters and running the simulation itself.
+     * <p>
+     * Especially considering the possibility of validating min and max values for width, height, number of mountains,
+     * treasures, players. Or considering even more complex validation logic and creation logic, like procedural
+     * generation.
      */
     private void validate() {
         validateTerritorySize();

@@ -3,6 +3,7 @@ package org.example.infra;
 import lombok.SneakyThrows;
 import org.example.domain.Mountain;
 import org.example.domain.Territory;
+import org.example.domain.Treasure;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -28,10 +29,27 @@ public class InputReader {
     }
 
     public static void readLine(String line, TerritoryData territoryData) {
-        if(line.startsWith("C")){
+        if (line.startsWith("C")) {
             readSize(line, territoryData);
+        } else if (line.startsWith("M")) {
+            readMountain(line, territoryData);
+        } else {
+            String[] split = line.split("-");
+            Treasure treasure = new Treasure(Integer.parseInt(split[1].trim()),
+                    Integer.parseInt(split[2].trim()),
+                    Integer.parseInt(split[3].trim()));
+            territoryData.addTreasure(treasure);
         }
-        readMountain(line, territoryData);
+    }
+
+    private static void readSize(String line, TerritoryData territoryData) {
+        if (territoryData.getSize() != null) {
+            throw new IllegalArgumentException(SIZE_ALREADY_DEFINED_ERROR_MESSAGE_FORMAT.formatted(line));
+        }
+        String[] split = line.split("-");
+        Territory.Size size = new Territory.Size(Integer.parseInt(split[1].trim()),
+                Integer.parseInt(split[2].trim()));
+        territoryData.setSize(size);
     }
 
     private static void readMountain(String line, TerritoryData territoryData) {
@@ -39,15 +57,5 @@ public class InputReader {
         Mountain mountain = new Mountain(Integer.parseInt(split[1].trim()),
                 Integer.parseInt(split[2].trim()));
         territoryData.addMountain(mountain);
-    }
-
-    private static void readSize(String line, TerritoryData territoryData) {
-        if(territoryData.getSize() != null){
-            throw new IllegalArgumentException(SIZE_ALREADY_DEFINED_ERROR_MESSAGE_FORMAT.formatted(line));
-        }
-        String[] split = line.split("-");
-        Territory.Size size = new Territory.Size(Integer.parseInt(split[1].trim()),
-                Integer.parseInt(split[2].trim()));
-        territoryData.setSize(size);
     }
 }
