@@ -35,7 +35,7 @@ public class InputReader {
             readMountain(line, territoryData);
         } else if (line.startsWith("T")) {
             readTreasure(line, territoryData);
-        } else {
+        } else if (line.startsWith("A")) {
             readPlayer(line, territoryData);
         }
     }
@@ -52,8 +52,7 @@ public class InputReader {
 
     private static Orientation readOrientation(String orientationString) {
         OrientationInput orientationInput = OrientationInput.valueOf(orientationString.trim());
-        Orientation orientation = orientationInput.toDomainValue();
-        return orientation;
+        return orientationInput.toDomainValue();
     }
 
     private static List<Command> readCommands(String commandsString) {

@@ -3,12 +3,13 @@ package org.example.infra;
 import org.assertj.core.api.ThrowableAssert;
 import org.example.domain.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.List;
 
 import static java.util.List.of;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.example.domain.Command.*;
 import static org.example.domain.Orientation.NORTH;
 import static org.example.domain.Orientation.SOUTH;
@@ -110,5 +111,50 @@ class InputReaderShould {
         assertThat(territoryData.getPlayers())
                 .usingRecursiveFieldByFieldElementComparator()
                 .isEqualTo(expectedPlayers);
+    }
+
+    @Test
+    void ignore_lines_starting_with_hash() {
+        // GIVEN
+        TerritoryData territoryData = new TerritoryData();
+
+        // WHEN
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> InputReader.readLine("# Comment", territoryData);
+
+        // THEN
+        assertThatCode(throwingCallable)
+                .doesNotThrowAnyException();
+        assertThat(territoryData.getSize()).isNull();
+        assertThat(territoryData.getMountains()).isEmpty();
+        assertThat(territoryData.getTreasures()).isEmpty();
+        assertThat(territoryData.getPlayers()).isEmpty();
+    }
+
+    /**
+     * I decided to apply a somewhat "tolerant reader" principle, and ignore any line that doesn't start with 'C', 'M', 'T' or
+     * 'A'.
+     * TODO Later on, verify that a warn log is written so that potential errors are not silently swept under the rug
+     * @param line
+     */
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "x - sk jdsjs",
+            "noise",
+            "",
+    })
+    void ignore_lines_starting_with_anything_else(String line) {
+        // GIVEN
+        TerritoryData territoryData = new TerritoryData();
+
+        // WHEN
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> InputReader.readLine(line, territoryData);
+
+        // THEN
+        assertThatCode(throwingCallable)
+                .doesNotThrowAnyException();
+        assertThat(territoryData.getSize()).isNull();
+        assertThat(territoryData.getMountains()).isEmpty();
+        assertThat(territoryData.getTreasures()).isEmpty();
+        assertThat(territoryData.getPlayers()).isEmpty();
     }
 }
