@@ -27,11 +27,4 @@ public class TerritoryData {
     public void addPlayer(Player player) {
         this.players.add(player);
     }
-
-    public void parse(String line) {
-        String[] split = line.split("-");
-        Territory.Size size = new Territory.Size(Integer.parseInt(split[1].trim()),
-                Integer.parseInt(split[2].trim()));
-        this.setSize(size);
-    }
 }
