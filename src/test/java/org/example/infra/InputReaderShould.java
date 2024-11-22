@@ -18,15 +18,17 @@ class InputReaderShould {
 
     @Test
     void read_whole_file() {
+        // GIVEN
+        String filePath = "src/test/resources/test-input-1.txt";
+
         // WHEN
-        TerritoryData territoryData = InputReader.readFile("src/test/resources/test-input-1.txt");
+        TerritoryData territoryData = InputReader.readFile(filePath);
 
         // THEN
-        Territory.Size expected = new Territory.Size(3, 4);
-        assertThat(territoryData)
-                .extracting(TerritoryData::getSize)
-                .isNotNull()
-                .isEqualTo(expected);
+        assertThat(territoryData.getSize()).isEqualTo(new Territory.Size(3, 4));
+        assertThat(territoryData.getMountains()).isEqualTo(getMountainsFromInstructions());
+        assertThat(territoryData.getTreasures()).isEqualTo(getTreasuresFromInstructions());
+        assertThat(territoryData.getPlayers()).isEqualTo(of(getPlayerLara()));
     }
 
     @Test
@@ -69,9 +71,7 @@ class InputReaderShould {
         InputReader.readLine("M - 2 - 1", territoryData);
 
         // THEN
-        List<Mountain> expectedMountains = of(new Mountain(1, 0),
-                new Mountain(2, 1));
-        assertThat(territoryData.getMountains()).isEqualTo(expectedMountains);
+        assertThat(territoryData.getMountains()).isEqualTo(getMountainsFromInstructions());
     }
 
     @Test
@@ -84,9 +84,7 @@ class InputReaderShould {
         InputReader.readLine("T - 1 - 3 - 3", territoryData);
 
         // THEN
-        List<Treasure> expectedTreasures = of(new Treasure(0, 3, 2),
-                new Treasure(1, 3, 3));
-        assertThat(territoryData.getTreasures()).isEqualTo(expectedTreasures);
+        assertThat(territoryData.getTreasures()).isEqualTo(getTreasuresFromInstructions());
     }
 
     @Test
@@ -99,18 +97,14 @@ class InputReaderShould {
         InputReader.readLine("A - Jones - 2 - 2 - N - ADGGAGDDGA", territoryData);
 
         // THEN
-        Player lara = new Player("Lara",
-                new Coordinates(1, 1),
-                SOUTH,
-                of(A, A, D, A, D, A, G, G, A));
+        Player lara = getPlayerLara();
         Player jones = new Player("Jones",
                 new Coordinates(2, 2),
                 NORTH,
                 of(A, D, G, G, A, G, D, D, G, A));
-        List<Player> expectedPlayers = of(lara, jones);
         assertThat(territoryData.getPlayers())
                 .usingRecursiveFieldByFieldElementComparator()
-                .isEqualTo(expectedPlayers);
+                .isEqualTo(of(lara, jones));
     }
 
     @Test
@@ -131,9 +125,10 @@ class InputReaderShould {
     }
 
     /**
-     * I decided to apply a somewhat "tolerant reader" principle, and ignore any line that doesn't start with 'C', 'M', 'T' or
-     * 'A'.
+     * I decided to apply a somewhat "tolerant reader" principle, and ignore any line that doesn't start with 'C', 'M',
+     * 'T' or 'A'.
      * TODO Later on, verify that a warn log is written so that potential errors are not silently swept under the rug
+     *
      * @param line
      */
     @ParameterizedTest
@@ -156,5 +151,22 @@ class InputReaderShould {
         assertThat(territoryData.getMountains()).isEmpty();
         assertThat(territoryData.getTreasures()).isEmpty();
         assertThat(territoryData.getPlayers()).isEmpty();
+    }
+
+    private List<Mountain> getMountainsFromInstructions() {
+        return of(new Mountain(1, 0),
+                new Mountain(2, 1));
+    }
+
+    private List<Treasure> getTreasuresFromInstructions() {
+        return of(new Treasure(0, 3, 2),
+                new Treasure(1, 3, 3));
+    }
+
+    private Player getPlayerLara() {
+        return new Player("Lara",
+                new Coordinates(1, 1),
+                SOUTH,
+                of(A, A, D, A, D, A, G, G, A));
     }
 }
