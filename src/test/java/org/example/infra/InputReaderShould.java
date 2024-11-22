@@ -17,7 +17,7 @@ class InputReaderShould {
     @Test
     void read_whole_file() {
         // GIVEN
-        String filePath = "src/test/resources/test-input-1.txt";
+        String filePath = "src/test/resources/input.txt";
 
         // WHEN
         TerritoryData territoryData = InputReader.readFile(filePath);

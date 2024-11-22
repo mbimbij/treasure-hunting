@@ -4,17 +4,12 @@ import org.example.domain.*;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class OutputFileWriter {
+public class TerritoryFormatter {
 
     private final String newLine = System.lineSeparator();
-
-    public void writeToFile(Territory territory, Path file) {
-
-    }
 
     public String formatSize(Territory.Size size) {
         return "C - %d - %d".formatted(size.width(), size.height());
