@@ -1,9 +1,7 @@
 package org.example.infra;
 
 import lombok.SneakyThrows;
-import org.example.domain.Mountain;
-import org.example.domain.Territory;
-import org.example.domain.Treasure;
+import org.example.domain.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -18,6 +16,7 @@ import static java.util.List.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assumptions.assumeThat;
 import static org.example.TestDataFactory.*;
+import static org.example.domain.Orientation.SOUTH;
 
 class OutputFileWriterShould {
 
@@ -129,6 +128,21 @@ class OutputFileWriterShould {
         assertThat(formattedTreasures).isEqualTo("""
                 T - 1 - 0 - 2
                 T - 1 - 2 - 3""");
+    }
+
+    @Test
+    void format_player_appropriately() {
+        // GIVEN
+        Player player = playerLara()
+                .withCoordinates(new Coordinates(0,3))
+                .withOrientation(SOUTH)
+                .withCollectedTreasuresCount(3);
+
+        // WHEN
+        String formattedPlayer = outputFileWriter.formatPlayer(player);
+
+        // THEN
+        assertThat(formattedPlayer).isEqualTo("A - Lara - 0 - 3 - S - 3");
     }
 
     private void setupAndVerifyOutputFile(Path outputDirPath, Path outputFilePath) throws IOException {

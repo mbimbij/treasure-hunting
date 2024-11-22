@@ -1,8 +1,6 @@
 package org.example.infra;
 
-import org.example.domain.Mountain;
-import org.example.domain.Territory;
-import org.example.domain.Treasure;
+import org.example.domain.*;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -41,5 +39,15 @@ public class OutputFileWriter {
         return treasures.stream().filter(treasure -> !treasure.isEmpty())
                 .map(this::formatTreasure)
                 .collect(Collectors.joining(newLine));
+    }
+
+    public String formatPlayer(Player player) {
+        return "A - %s - %d - %d - %s - %d".formatted(
+                player.getName(),
+                player.coordinates().westEast(),
+                player.coordinates().northSouth(),
+                OrientationData.from(player.getOrientation()),
+                player.getCollectedTreasuresCount()
+        );
     }
 }
