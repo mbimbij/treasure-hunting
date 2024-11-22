@@ -16,7 +16,6 @@ import static java.util.List.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assumptions.assumeThat;
 import static org.example.TestDataFactory.*;
-import static org.example.domain.Orientation.SOUTH;
 
 class OutputFileWriterShould {
 
@@ -57,6 +56,32 @@ class OutputFileWriterShould {
                 M - 2 - 1
                 T - 1 - 3 - 2
                 A - Lara - 0 - 3 - S - 3
+                """);
+    }
+
+    @SneakyThrows
+    @Test
+    void format_entire_simulation_results() {
+        // GIVEN a setup similar to the instructions, BUT without player and treasure overlap AND an empty treasure chest
+        Territory.Size size = sizeFromInstructions();
+        Territory territory = new Territory(size.width(),
+                size.height(),
+                mountainsFromInstructions(),
+                of(new Treasure(0, 3, 0),
+                        new Treasure(1, 3, 3)
+                ),
+                of(playerLara()));
+
+        // WHEN
+        String formattedTerritory = outputFileWriter.formatTerritory(territory);
+
+        // THEN
+        assertThat(formattedTerritory).isEqualTo("""
+                C - 3 - 4
+                M - 1 - 0
+                M - 2 - 1
+                T - 1 - 3 - 3
+                A - Lara - 1 - 1 - S - 0
                 """);
     }
 
@@ -133,10 +158,7 @@ class OutputFileWriterShould {
     @Test
     void format_player_appropriately() {
         // GIVEN
-        Player player = playerLara()
-                .withCoordinates(new Coordinates(0,3))
-                .withOrientation(SOUTH)
-                .withCollectedTreasuresCount(3);
+        Player player = playerLaraAfterSimulation();
 
         // WHEN
         String formattedPlayer = outputFileWriter.formatPlayer(player);

@@ -50,4 +50,27 @@ public class OutputFileWriter {
                 player.getCollectedTreasuresCount()
         );
     }
+
+    public String formatTerritory(Territory territory) {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        printWriter.println(formatSize(new Territory.Size(territory.getWidth(), territory.getHeight())));
+        printWriter.println(formatMountains(territory.getMountains()));
+        printWriter.println(formatTreasures(territory.getTreasures()));
+        printWriter.println(formatPlayers(territory.getPlayers()));
+        return stringWriter.toString();
+    }
+
+    private String formatPlayers(List<Player> players) {
+        return players.stream()
+                .map(this::formatPlayer)
+                .collect(Collectors.joining(newLine));
+    }
+
+    private String formatMountains(List<Mountain> mountains) {
+        return mountains
+                .stream()
+                .map(this::formatMountain)
+                .collect(Collectors.joining(newLine));
+    }
 }

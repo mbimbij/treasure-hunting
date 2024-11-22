@@ -29,4 +29,11 @@ public class TestDataFactory {
                 SOUTH,
                 of(A, A, D, A, D, A, G, G, A));
     }
+
+    public static Player playerLaraAfterSimulation() {
+        return playerLara()
+                .withCoordinates(new Coordinates(0, 3))
+                .withOrientation(SOUTH)
+                .withCollectedTreasuresCount(3);
+    }
 }
