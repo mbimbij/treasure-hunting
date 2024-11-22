@@ -1,4 +1,4 @@
-package org.example;
+package org.example.domain;
 
 public record Mountain(Coordinates coordinates) implements CanCollideWith {
     public Mountain(int weCoordinates, int nsCoordinates) {

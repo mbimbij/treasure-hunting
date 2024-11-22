@@ -1,4 +1,4 @@
-package org.example;
+package org.example.domain;
 
 import net.jqwik.api.*;
 import org.assertj.core.api.ThrowableAssert;
@@ -9,7 +9,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InOrder;
 
-import java.util.ArrayDeque;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -18,8 +17,8 @@ import static java.util.List.of;
 import static net.jqwik.api.Arbitraries.integers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.example.Command.*;
-import static org.example.Orientation.*;
+import static org.example.domain.Command.*;
+import static org.example.domain.Orientation.*;
 import static org.mockito.Mockito.*;
 
 class TerritoryShould {
@@ -41,7 +40,7 @@ class TerritoryShould {
             NORTH);
 
     @Property
-    void create_territory_with_specified_size(@ForAll("validPairsOfWidthAndHeight") IntegerPair widthHeightPair) {
+    void create_territory_with_specified_size(@ForAll("validPairsOfWidthAndHeight") Territory.Size widthHeightPair) {
         // GIVEN
         Integer width = widthHeightPair.first();
         Integer height = widthHeightPair.second();
@@ -123,7 +122,7 @@ class TerritoryShould {
     }
 
     @Property
-    void throw_exception_for_invalid_width_or_height(@ForAll("invalidPairsOfWidthAndHeight") IntegerPair pair) {
+    void throw_exception_for_invalid_width_or_height(@ForAll("invalidPairsOfWidthAndHeight") Territory.Size pair) {
         // GIVEN
         Integer width = pair.first();
         Integer height = pair.second();
@@ -409,17 +408,17 @@ class TerritoryShould {
     }
 
     @Provide
-    Arbitrary<IntegerPair> validPairsOfWidthAndHeight() {
+    Arbitrary<Territory.Size> validPairsOfWidthAndHeight() {
         return Combinators.combine(integers(), integers())
                 .filter((integer, integer2) -> integer > 0 && integer2 > 0)
-                .as(IntegerPair::new);
+                .as(Territory.Size::new);
     }
 
     @Provide
-    private Arbitrary<IntegerPair> invalidPairsOfWidthAndHeight() {
+    private Arbitrary<Territory.Size> invalidPairsOfWidthAndHeight() {
         return Combinators.combine(integers(), integers())
                 .filter((integer, integer2) -> integer <= 0 || integer2 <= 0)
-                .as(IntegerPair::new);
+                .as(Territory.Size::new);
     }
 
     /**
@@ -566,9 +565,4 @@ class TerritoryShould {
         }
 
     }
-
-
-}
-
-record IntegerPair(Integer first, Integer second) {
 }
