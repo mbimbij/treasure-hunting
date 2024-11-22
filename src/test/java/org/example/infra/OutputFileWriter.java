@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class OutputFileWriter {
 
-    private final String newLine = System.getProperty("line.separator");
+    private final String newLine = System.lineSeparator();
 
     public void writeToFile(Territory territory, Path file) {
 
