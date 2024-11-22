@@ -25,7 +25,6 @@ import java.util.Queue;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @With
 @ToString(includeFieldNames = false)
-@AllArgsConstructor
 public class Player implements CanCollideWith {
     @EqualsAndHashCode.Include
     private final String name;
@@ -43,6 +42,14 @@ public class Player implements CanCollideWith {
         this.name = name;
         this.coordinates = coordinates;
         this.collectedTreasuresCount = 0;
+        this.remainingCommands = new ArrayDeque<>(remainingCommands);
+    }
+
+    public Player(String name, Coordinates coordinates, Orientation orientation, int collectedTreasuresCount, Collection<Command> remainingCommands) {
+        this.name = name;
+        this.coordinates = coordinates;
+        this.orientation = orientation;
+        this.collectedTreasuresCount = collectedTreasuresCount;
         this.remainingCommands = new ArrayDeque<>(remainingCommands);
     }
 

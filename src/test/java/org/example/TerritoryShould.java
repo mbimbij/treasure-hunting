@@ -326,6 +326,47 @@ class TerritoryShould {
         inOrder.verify(territory).turnLeft(player1);
     }
 
+    @Test
+    void run_the_example_simulation_of_the_instructions() {
+        // GIVEN
+        int width = 3;
+        int height = 4;
+
+        List<Command> commands = of(A, A, D, A, D, A, G, G, A);
+        Player playerBeforeSimulation = new Player("Lara",
+                new Coordinates(1, 1),
+                SOUTH,
+                commands);
+        Player expectedPlayerAfterSimulation = new Player("Lara",
+                new Coordinates(0, 3),
+                SOUTH,
+                3,
+                emptyList());
+        List<Mountain> mountains = of(new Mountain(1, 0),
+                new Mountain(2, 1)
+        );
+        List<Treasure> treasures = of(
+                new Treasure(0, 3, 2),
+                new Treasure(1, 3, 3)
+        );
+        Territory territory = new Territory(width,
+                height,
+                mountains,
+                treasures,
+                of(playerBeforeSimulation));
+
+        // WHEN
+        territory.runSimulation();
+
+        // THEN
+        assertThat(territory.getPlayers())
+                .singleElement()
+                .satisfies(l ->{
+                    assertThat(l).usingRecursiveComparison()
+                            .isEqualTo(expectedPlayerAfterSimulation);
+                });
+    }
+
     private static Stream<Arguments> should_move_player_forward_respecting_boundaries_and_collisions() {
         Player facingNoObstacle = new Player("player1", new Coordinates(0, 1), NORTH);
         Player facingNorthernLimit = new Player("player1", new Coordinates(0, 0), NORTH);
