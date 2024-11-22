@@ -1,6 +1,9 @@
 package org.example.domain;
 
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+import lombok.With;
 
 import java.util.ArrayDeque;
 import java.util.Collection;

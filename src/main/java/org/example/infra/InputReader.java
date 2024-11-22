@@ -51,7 +51,7 @@ public class InputReader {
     }
 
     private static Orientation readOrientation(String orientationString) {
-        OrientationInput orientationInput = OrientationInput.valueOf(orientationString.trim());
+        OrientationData orientationInput = OrientationData.valueOf(orientationString.trim());
         return orientationInput.toDomainValue();
     }
 
