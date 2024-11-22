@@ -1,8 +1,9 @@
 package org.example.infra;
 
 import lombok.SneakyThrows;
-import org.assertj.core.api.Assertions;
+import org.example.domain.Mountain;
 import org.example.domain.Territory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -18,6 +19,13 @@ import static org.example.TestDataFactory.*;
 
 class OutputFileWriterShould {
 
+    private OutputFileWriter outputFileWriter;
+
+    @BeforeEach
+    void setUp() {
+        outputFileWriter = new OutputFileWriter();
+    }
+
     /**
      * write an output file in "target" directory, as it is expected to be present, and allowed to be created or written
      * to, and is not version controlled.
@@ -32,7 +40,6 @@ class OutputFileWriterShould {
                 mountainsFromInstructions(),
                 treasuresFromInstructions(),
                 List.of(playerLara()));
-        OutputFileWriter outputFileWriter = new OutputFileWriter();
 
         Path outputDirPath = Paths.get("target");
         Path outputFilePath = Paths.get("target", "output.txt");
@@ -50,6 +57,30 @@ class OutputFileWriterShould {
                 T - 1 - 3 - 2
                 A - Lara - 0 - 3 - S - 3
                 """);
+    }
+
+    @Test
+    void format_simulation_size_appropriately() {
+        // GIVEN
+        Territory.Size size = sizeFromInstructions();
+
+        // WHEN
+        String formattedSize = outputFileWriter.formatSize(size);
+
+        // THEN
+        assertThat(formattedSize).isEqualTo("C - 3 - 4");
+    }
+
+    @Test
+    void format_mountains_appropriately() {
+        // GIVEN
+        Mountain mountain = new Mountain(1, 0);
+
+        // WHEN
+        String formattedSize = outputFileWriter.formatMountain(mountain);
+
+        // THEN
+        assertThat(formattedSize).isEqualTo("M - 1 - 0");
     }
 
     private void setupAndVerifyOutputFile(Path outputDirPath, Path outputFilePath) throws IOException {
