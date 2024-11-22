@@ -25,8 +25,6 @@ public class Territory {
     public static final String FEATURES_COORDINATES_OUT_OF_BOUND_ERROR_MESSAGE = "Some features are located outside the territory: %s";
 
     // TODO question au PO: min et max pour la largeur et la hauteur de la carte ? Si oui, amha, la validation devrait être sortie de la classe Territory, mais il y a de bons arguments pour le contraire.
-    private final int width;
-    private final int height;
     private final Size size;
     // TODO question au PO: min montagnes: 0  1 ? max montagnes: un nombre constant, en entrée de l'application, ou calculé en fonction de la taille de la carte et du nombre de features ?
     private final List<Mountain> mountains;
@@ -37,12 +35,18 @@ public class Territory {
 
     public Territory(Size size, List<Mountain> mountains, List<Treasure> treasures, List<Player> players) {
         this.size = size;
-        this.width = this.size.width;
-        this.height = this.size.height;
         this.mountains = mountains;
         this.treasures = treasures;
         this.players = players;
         validate();
+    }
+
+    public int getWidth() {
+        return size.width();
+    }
+
+    public int getHeight() {
+        return size.height();
     }
 
     public void runSimulation() {
