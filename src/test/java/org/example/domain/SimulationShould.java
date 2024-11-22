@@ -255,7 +255,7 @@ class SimulationShould {
         Simulation simulation = spy(new Simulation(size, emptyList(), emptyList(), of(player)));
 
         // WHEN
-        simulation.runSimulation();
+        simulation.run();
 
         // THEN
         InOrder inOrder = inOrder(simulation);
@@ -277,7 +277,7 @@ class SimulationShould {
         Simulation simulation = spy(new Simulation(size, emptyList(), emptyList(), of(player1, player2)));
 
         // WHEN
-        simulation.runSimulation();
+        simulation.run();
 
         // THEN
         InOrder inOrder = inOrder(simulation);
@@ -313,7 +313,7 @@ class SimulationShould {
         Simulation simulation = new Simulation(size, mountains, treasures, of(playerBeforeSimulation));
 
         // WHEN
-        simulation.runSimulation();
+        simulation.run();
 
         // THEN
         assertThat(simulation.getPlayers())

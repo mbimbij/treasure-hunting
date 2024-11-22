@@ -92,7 +92,7 @@ public class Player implements CanCollideWith {
         this.collectedTreasuresCount++;
     }
 
-    public Optional<Command> popNextCommand() {
+    public Optional<Command> pollNextCommand() {
         return Optional.ofNullable(this.remainingCommands.poll());
     }
 

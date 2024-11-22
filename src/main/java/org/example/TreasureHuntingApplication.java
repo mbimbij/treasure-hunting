@@ -21,7 +21,7 @@ public class TreasureHuntingApplication {
                 simulationData.getMountains(),
                 simulationData.getTreasures(),
                 simulationData.getPlayers());
-        simulation.runSimulation();
+        simulation.run();
         String formatted = new SimulationFormatter().formatSimulation(simulation);
         OutputWriter.writeToFile(formatted, outputFilePath);
     }

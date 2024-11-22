@@ -50,7 +50,7 @@ public class Simulation {
         return size.height();
     }
 
-    public void runSimulation() {
+    public void run() {
         while (commandsRemaining()) {
             playTurn();
         }
@@ -58,13 +58,12 @@ public class Simulation {
 
     public void playTurn() {
         for (Player player : players) {
-            player.popNextCommand().ifPresent(command -> {
+            player.pollNextCommand().ifPresent(command -> {
                 switch (command) {
                     case A -> moveForward(player);
                     case G -> turnLeft(player);
                     case D -> turnRight(player);
                 }
-                ;
             });
         }
     }
