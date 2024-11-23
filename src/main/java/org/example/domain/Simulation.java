@@ -16,7 +16,12 @@ import static java.util.stream.Collectors.groupingBy;
  * Represent 'Madre de Dios' simulation. I opted for a noun for the class name and 'Madre de Dios' for the instance.
  * name. "Carte" translates to "Map", and I didn't want to have potential collisions with java.util.Map, so I decided on
  * "Territory".
- * ETA: switched to "Simulation"
+ * <p>
+ * ETA: Changed name to "Simulation"
+ * <p>
+ * ETA2: class is not a record, despite IDE warning, for the same reason as Player. Its internal state "mutates", due to
+ * players and treasures changing states. And thinking in DDD terms, it would align with an entity, an aggregate even,
+ * and a record for an aggregate doesn't feel right.
  */
 @Getter
 public class Simulation {
@@ -161,8 +166,8 @@ public class Simulation {
     }
 
     private List<Coordinates> getAllFeaturesCoordinates() {
-        List<Coordinates> treasuresCoordinates = this.treasures.stream().map(Treasure::coordinates).toList();
-        List<Coordinates> mountainsCoordinates = this.mountains.stream().map(Mountain::coordinates).toList();
+        List<Coordinates> treasuresCoordinates = this.treasures.stream().map(Treasure::getCoordinates).toList();
+        List<Coordinates> mountainsCoordinates = this.mountains.stream().map(Mountain::getCoordinates).toList();
         List<Coordinates> playersCoordinates = this.getPlayers().stream().map(Player::getCoordinates).toList();
         List<Coordinates> allFeaturesCoordinates = new ArrayList<>();
         allFeaturesCoordinates.addAll(treasuresCoordinates);
@@ -193,21 +198,22 @@ public class Simulation {
     private Optional<Treasure> getNonEmptyTreasureAtPlayersPosition(Coordinates playerCoordinates) {
         return this.treasures
                 .stream()
-                .filter(treasure -> treasure.collidesWith(playerCoordinates))
-                .findAny()
-                .filter(treasure -> !treasure.isEmpty());
+                .filter(treasure ->
+                        treasure.intersectsWith(playerCoordinates)
+                        && !treasure.isEmpty())
+                .findAny();
     }
 
     private boolean collidesWithMountain(Coordinates futurePosition) {
         return this.mountains
                 .stream()
-                .anyMatch(mountain -> mountain.collidesWith(futurePosition));
+                .anyMatch(mountain -> mountain.intersectsWith(futurePosition));
     }
 
     private boolean collidesWithAnotherPlayer(Coordinates futurePosition) {
         return this.players
                 .stream()
-                .anyMatch(otherPlayer -> otherPlayer.collidesWith(futurePosition));
+                .anyMatch(otherPlayer -> otherPlayer.intersectsWith(futurePosition));
     }
 
     public void turnLeft(Player player) {

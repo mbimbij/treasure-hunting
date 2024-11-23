@@ -1,14 +1,16 @@
 package org.example.domain;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString
-public final class Treasure implements CanCollideWith {
+public final class Treasure implements CanIntersectWith {
     public static final String CREATE_WITH_NEGATIVE_QUANTITY_ERROR_MESSAGE = "Cannot create treasures with negative quantity";
     public static final String COLLECT_EMPTY_TREASURE_ERROR_MESSAGE = "Cannot collect empty treasure";
     @EqualsAndHashCode.Include
+    @Getter
     private final Coordinates coordinates;
     private int quantity;
 
@@ -29,11 +31,6 @@ public final class Treasure implements CanCollideWith {
             throw new IllegalStateException(COLLECT_EMPTY_TREASURE_ERROR_MESSAGE);
         }
         this.quantity--;
-    }
-
-    @Override
-    public Coordinates coordinates() {
-        return coordinates;
     }
 
     public int quantity() {

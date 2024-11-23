@@ -16,12 +16,7 @@ import static org.example.TestDataFactory.*;
 
 class SimulationFormatterShould {
 
-    private SimulationFormatter formatter;
-
-    @BeforeEach
-    void setUp() {
-        formatter = new SimulationFormatter();
-    }
+    private final SimulationFormatter formatter = new SimulationFormatter();
 
     @SneakyThrows
     @Test

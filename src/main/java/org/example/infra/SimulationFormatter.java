@@ -19,14 +19,14 @@ public class SimulationFormatter {
     }
 
     public String formatMountain(Mountain mountain) {
-        int weCoordinates = mountain.coordinates().westEast();
-        int nsCoordinates = mountain.coordinates().northSouth();
+        int weCoordinates = mountain.getCoordinates().westEast();
+        int nsCoordinates = mountain.getCoordinates().northSouth();
         return "M - %d - %d".formatted(weCoordinates, nsCoordinates);
     }
 
     public String formatTreasure(Treasure treasure) {
-        int weCoordinates = treasure.coordinates().westEast();
-        int nsCoordinates = treasure.coordinates().northSouth();
+        int weCoordinates = treasure.getCoordinates().westEast();
+        int nsCoordinates = treasure.getCoordinates().northSouth();
         int remainingQuantity = treasure.quantity();
         return "T - %d - %d - %d".formatted(weCoordinates, nsCoordinates, remainingQuantity);
     }
@@ -42,8 +42,8 @@ public class SimulationFormatter {
     public String formatPlayer(Player player) {
         return "A - %s - %d - %d - %s - %d".formatted(
                 player.getName(),
-                player.coordinates().westEast(),
-                player.coordinates().northSouth(),
+                player.getCoordinates().westEast(),
+                player.getCoordinates().northSouth(),
                 OrientationData.from(player.getOrientation()),
                 player.getCollectedTreasuresCount()
         );

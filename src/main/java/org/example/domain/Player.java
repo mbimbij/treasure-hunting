@@ -28,7 +28,7 @@ import java.util.Queue;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @With
 @ToString(includeFieldNames = false)
-public class Player implements CanCollideWith {
+public class Player implements CanIntersectWith {
     @EqualsAndHashCode.Include
     private final String name;
     private Coordinates coordinates;
@@ -73,11 +73,6 @@ public class Player implements CanCollideWith {
             case SOUTH -> coordinates.southOf();
             case WEST -> coordinates.westOf();
         };
-    }
-
-    @Override
-    public Coordinates coordinates() {
-        return getCoordinates();
     }
 
     public void turnLeft() {

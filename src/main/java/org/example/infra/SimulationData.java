@@ -9,6 +9,9 @@ import org.example.domain.Treasure;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Could have been also used for writing results, although not necessary. Could have been replaced with a builder.
+ */
 @Data
 public class SimulationData {
     private Simulation.Size size;
