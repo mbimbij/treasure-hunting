@@ -23,25 +23,25 @@ class InputReaderShould {
         String filePath = "src/test/resources/input.txt";
 
         // WHEN
-        SimulationBuilder simulationData = InputReader.readFile(filePath);
+        SimulationBuilder builder = InputReader.readFile(filePath);
 
         // THEN
-        assertThat(simulationData.getSize()).isEqualTo(TestDataFactory.defaultSimulationSize());
-        assertThat(simulationData.getMountains()).isEqualTo(TestDataFactory.defaultMountains());
-        assertThat(simulationData.getTreasures()).isEqualTo(TestDataFactory.defaultTreasures());
-        assertThat(simulationData.getPlayers()).isEqualTo(of(lara()));
+        assertThat(builder.getSize()).isEqualTo(TestDataFactory.defaultSimulationSize());
+        assertThat(builder.getMountains()).isEqualTo(TestDataFactory.defaultMountains());
+        assertThat(builder.getTreasures()).isEqualTo(TestDataFactory.defaultTreasures());
+        assertThat(builder.getPlayers()).isEqualTo(of(lara()));
     }
 
     @Test
     void read_simulation_size() {
         // GIVEN
-        SimulationBuilder simulationData = Simulation.builder();
+        SimulationBuilder builder = Simulation.builder();
 
         // WHEN
-        InputReader.readLine("C - 3 - 4", simulationData);
+        InputReader.readLine("C - 3 - 4", builder);
 
         // THEN
-        assertThat(simulationData).extracting(SimulationBuilder::getSize)
+        assertThat(builder).extracting(SimulationBuilder::getSize)
                 .isNotNull()
                 .isEqualTo(TestDataFactory.defaultSimulationSize());
     }
@@ -49,12 +49,11 @@ class InputReaderShould {
     @Test
     void throw_exception_if_read_simulation_size_but_already_defined() {
         // GIVEN
-        SimulationBuilder simulationData = Simulation.builder();
-        simulationData.withSize(2, 4);
+        SimulationBuilder builder = Simulation.builder().withSize(2, 4);
 
         // WHEN
         String line = "C - 3 - 4";
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> InputReader.readLine(line, simulationData);
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> InputReader.readLine(line, builder);
 
         // THEN
         assertThatThrownBy(throwingCallable)
@@ -65,45 +64,45 @@ class InputReaderShould {
     @Test
     void read_mountains() {
         // GIVEN
-        SimulationBuilder simulationData = Simulation.builder();
+        SimulationBuilder builder = Simulation.builder();
 
         // WHEN
-        InputReader.readLine("M - 1 - 0", simulationData);
-        InputReader.readLine("M - 2 - 1", simulationData);
+        InputReader.readLine("M - 1 - 0", builder);
+        InputReader.readLine("M - 2 - 1", builder);
 
         // THEN
         List<Mountain> expected = of(new Mountain(1, 0),
                 new Mountain(2, 1));
-        assertThat(simulationData.getMountains()).isEqualTo(expected);
+        assertThat(builder.getMountains()).isEqualTo(expected);
     }
 
     @Test
     void read_treasures() {
         // GIVEN
-        SimulationBuilder simulationData = Simulation.builder();
+        SimulationBuilder builder = Simulation.builder();
 
         // WHEN
-        InputReader.readLine("T - 0 - 3 - 2", simulationData);
-        InputReader.readLine("T - 1 - 3 - 3", simulationData);
+        InputReader.readLine("T - 0 - 3 - 2", builder);
+        InputReader.readLine("T - 1 - 3 - 3", builder);
 
         // THEN
         List<Treasure> expected = of(new Treasure(0, 3, 2),
                 new Treasure(1, 3, 3));
-        assertThat(simulationData.getTreasures()).isEqualTo(expected);
+        assertThat(builder.getTreasures()).isEqualTo(expected);
     }
 
     @Test
     void read_adventurers() {
         // GIVEN
-        SimulationBuilder simulationData = Simulation.builder();
+        SimulationBuilder builder = Simulation.builder();
 
         // WHEN
-        InputReader.readLine("A - Lara - 1 - 1 - S - AADADAGGA", simulationData);
-        InputReader.readLine("A - Jones - 2 - 2 - N - ADGGAGDDGA", simulationData);
+        InputReader.readLine("A - Lara - 1 - 1 - S - AADADAGGA", builder);
+        InputReader.readLine("A - Jones - 2 - 2 - N - ADGGAGDDGA", builder);
 
         // THEN
         List<Player> expected = of(lara(), jones());
-        assertThat(simulationData.getPlayers())
+        assertThat(builder.getPlayers())
                 .usingRecursiveFieldByFieldElementComparator()
                 .isEqualTo(expected);
     }
@@ -118,17 +117,17 @@ class InputReaderShould {
     @Test
     void ignore_lines_starting_with_hash() {
         // GIVEN
-        SimulationBuilder simulationData = Simulation.builder();
+        SimulationBuilder builder = Simulation.builder();
 
         // WHEN
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> InputReader.readLine("# Comment", simulationData);
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> InputReader.readLine("# Comment", builder);
 
         // THEN
         assertThatCode(throwingCallable).doesNotThrowAnyException();
-        assertThat(simulationData.getSize()).isNull();
-        assertThat(simulationData.getMountains()).isEmpty();
-        assertThat(simulationData.getTreasures()).isEmpty();
-        assertThat(simulationData.getPlayers()).isEmpty();
+        assertThat(builder.getSize()).isNull();
+        assertThat(builder.getMountains()).isEmpty();
+        assertThat(builder.getTreasures()).isEmpty();
+        assertThat(builder.getPlayers()).isEmpty();
     }
 
     /**

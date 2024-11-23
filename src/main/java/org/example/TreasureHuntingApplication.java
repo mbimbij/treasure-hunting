@@ -1,9 +1,9 @@
 package org.example;
 
 import org.example.domain.Simulation;
+import org.example.domain.SimulationBuilder;
 import org.example.infra.InputReader;
 import org.example.infra.OutputWriter;
-import org.example.domain.SimulationBuilder;
 import org.example.infra.SimulationFormatter;
 
 public class TreasureHuntingApplication {
