@@ -5,10 +5,9 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.With;
 
-import java.util.ArrayDeque;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.Queue;
+import java.util.*;
+
+import static java.util.Collections.emptyList;
 
 /**
  * Not making it a record, as the treasure count will be mutable, and returning a new instance with changed state feels
@@ -37,10 +36,13 @@ public class Player implements CanIntersectWith {
     private Queue<Command> remainingCommands;
 
     public Player(String name, Coordinates coordinates, Orientation orientation) {
-        this(name, coordinates, orientation, new ArrayDeque<>());
+        this(name, coordinates, orientation, emptyList());
     }
 
-    public Player(String name, Coordinates coordinates, Orientation orientation, Collection<Command> remainingCommands) {
+    public Player(String name,
+                  Coordinates coordinates,
+                  Orientation orientation,
+                  Collection<Command> remainingCommands) {
         this.orientation = orientation;
         this.name = name;
         this.coordinates = coordinates;
@@ -48,7 +50,19 @@ public class Player implements CanIntersectWith {
         this.remainingCommands = new ArrayDeque<>(remainingCommands);
     }
 
-    public Player(String name, Coordinates coordinates, Orientation orientation, int collectedTreasuresCount, Collection<Command> remainingCommands) {
+    /**
+     * Explicitely defined all-args constructor instead of lombok one, to pass commands as a list but use it as a queue.
+     * @param name
+     * @param coordinates
+     * @param orientation
+     * @param collectedTreasuresCount
+     * @param remainingCommands
+     */
+    public Player(String name,
+                  Coordinates coordinates,
+                  Orientation orientation,
+                  int collectedTreasuresCount,
+                  Collection<Command> remainingCommands) {
         this.name = name;
         this.coordinates = coordinates;
         this.orientation = orientation;
@@ -56,7 +70,7 @@ public class Player implements CanIntersectWith {
         this.remainingCommands = new ArrayDeque<>(remainingCommands);
     }
 
-    public void moveForward() {
+    void moveForward() {
         switch (getOrientation()) {
             case NORTH -> coordinates = coordinates.northOf();
             case EAST -> coordinates = coordinates.eastOf();
@@ -65,6 +79,14 @@ public class Player implements CanIntersectWith {
         }
     }
 
+
+    void turnLeft() {
+        this.orientation = this.orientation.leftOf();
+    }
+
+    void turnRight() {
+        this.orientation = this.orientation.rightOf();
+    }
 
     Coordinates getFuturePosition() {
         return switch (getOrientation()) {
@@ -75,19 +97,11 @@ public class Player implements CanIntersectWith {
         };
     }
 
-    public void turnLeft() {
-        this.orientation = this.orientation.leftOf();
-    }
-
-    public void turnRight() {
-        this.orientation = this.orientation.rightOf();
-    }
-
-    public void collectTreasure() {
+    void collectTreasure() {
         this.collectedTreasuresCount++;
     }
 
-    public Optional<Command> pollNextCommand() {
+    Optional<Command> pollNextCommand() {
         return Optional.ofNullable(this.remainingCommands.poll());
     }
 

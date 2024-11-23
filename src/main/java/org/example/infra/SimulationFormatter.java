@@ -52,7 +52,7 @@ public class SimulationFormatter {
     public String formatSimulation(Simulation simulation) {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
-        printWriter.println(formatSize(new Simulation.Size(simulation.getWidth(), simulation.getHeight())));
+        printWriter.println(formatSize(simulation.getSize()));
         printWriter.println(formatMountains(simulation.getMountains()));
         printWriter.println(formatTreasures(simulation.getTreasures()));
         printWriter.println(formatPlayers(simulation.getPlayers()));

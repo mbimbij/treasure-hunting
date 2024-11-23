@@ -47,21 +47,13 @@ public class Simulation {
         validate();
     }
 
-    public int getWidth() {
-        return size.width();
-    }
-
-    public int getHeight() {
-        return size.height();
-    }
-
     public void run() {
         while (commandsRemaining()) {
             playTurn();
         }
     }
 
-    public void playTurn() {
+    void playTurn() {
         for (Player player : players) {
             player.pollNextCommand().ifPresent(command -> {
                 switch (command) {
@@ -71,6 +63,58 @@ public class Simulation {
                 }
             });
         }
+    }
+
+    void moveForward(Player player) {
+        Coordinates futurePosition = player.getFuturePosition();
+        if (this.isOutOfBound(futurePosition)
+            || this.collidesWithMountain(futurePosition)
+            || this.collidesWithAnotherPlayer(futurePosition)) {
+            return;
+        }
+        player.moveForward();
+        collectTreasureIfApplicable(player);
+    }
+
+    private void collectTreasureIfApplicable(Player player) {
+        Optional<Treasure> nonEmptyTreasure = getNonEmptyTreasureAtPlayersPosition(player.getCoordinates());
+        nonEmptyTreasure.ifPresent(t -> {
+            t.collectTreasure();
+            player.collectTreasure();
+        });
+    }
+
+    private Optional<Treasure> getNonEmptyTreasureAtPlayersPosition(Coordinates playerCoordinates) {
+        return this.treasures
+                .stream()
+                .filter(treasure ->
+                        treasure.intersectsWith(playerCoordinates)
+                        && !treasure.isEmpty())
+                .findAny();
+    }
+
+    private boolean collidesWithMountain(Coordinates futurePosition) {
+        return this.mountains
+                .stream()
+                .anyMatch(mountain -> mountain.intersectsWith(futurePosition));
+    }
+
+    private boolean collidesWithAnotherPlayer(Coordinates futurePosition) {
+        return this.players
+                .stream()
+                .anyMatch(otherPlayer -> otherPlayer.intersectsWith(futurePosition));
+    }
+
+    void turnLeft(Player player) {
+        player.turnLeft();
+    }
+
+    void turnRight(Player player) {
+        player.turnRight();
+    }
+
+    boolean commandsRemaining() {
+        return players.stream().anyMatch(Player::hasRemainingCommands);
     }
 
     /**
@@ -174,58 +218,6 @@ public class Simulation {
         allFeaturesCoordinates.addAll(mountainsCoordinates);
         allFeaturesCoordinates.addAll(playersCoordinates);
         return allFeaturesCoordinates;
-    }
-
-    void moveForward(Player player) {
-        Coordinates futurePosition = player.getFuturePosition();
-        if (this.isOutOfBound(futurePosition)
-            || this.collidesWithMountain(futurePosition)
-            || this.collidesWithAnotherPlayer(futurePosition)) {
-            return;
-        }
-        player.moveForward();
-        collectTreasureIfApplicable(player);
-    }
-
-    private void collectTreasureIfApplicable(Player player) {
-        Optional<Treasure> nonEmptyTreasure = getNonEmptyTreasureAtPlayersPosition(player.getCoordinates());
-        nonEmptyTreasure.ifPresent(t -> {
-            t.collectTreasure();
-            player.collectTreasure();
-        });
-    }
-
-    private Optional<Treasure> getNonEmptyTreasureAtPlayersPosition(Coordinates playerCoordinates) {
-        return this.treasures
-                .stream()
-                .filter(treasure ->
-                        treasure.intersectsWith(playerCoordinates)
-                        && !treasure.isEmpty())
-                .findAny();
-    }
-
-    private boolean collidesWithMountain(Coordinates futurePosition) {
-        return this.mountains
-                .stream()
-                .anyMatch(mountain -> mountain.intersectsWith(futurePosition));
-    }
-
-    private boolean collidesWithAnotherPlayer(Coordinates futurePosition) {
-        return this.players
-                .stream()
-                .anyMatch(otherPlayer -> otherPlayer.intersectsWith(futurePosition));
-    }
-
-    public void turnLeft(Player player) {
-        player.turnLeft();
-    }
-
-    public void turnRight(Player player) {
-        player.turnRight();
-    }
-
-    private boolean commandsRemaining() {
-        return players.stream().anyMatch(Player::hasRemainingCommands);
     }
 
     public record Size(Integer width, Integer height) {

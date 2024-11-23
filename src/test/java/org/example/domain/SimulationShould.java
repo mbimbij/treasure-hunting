@@ -182,7 +182,7 @@ class SimulationShould {
     }
 
     @Test
-    void turn_player_left_and_right_when_turn_left_and_right() {
+    void turn_player_left_and_right() {
         // GIVEN
         int width = 1;
         int height = 1;
