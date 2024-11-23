@@ -2,15 +2,16 @@ package org.example.infra;
 
 import org.assertj.core.api.ThrowableAssert;
 import org.example.TestDataFactory;
-import org.example.domain.Coordinates;
-import org.example.domain.Player;
-import org.example.domain.Simulation;
+import org.example.domain.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.util.List;
+
 import static java.util.List.of;
 import static org.assertj.core.api.Assertions.*;
+import static org.example.TestDataFactory.lara;
 import static org.example.domain.Command.*;
 import static org.example.domain.Orientation.NORTH;
 
@@ -22,25 +23,25 @@ class InputReaderShould {
         String filePath = "src/test/resources/input.txt";
 
         // WHEN
-        SimulationData simulationData = InputReader.readFile(filePath);
+        SimulationBuilder builder = InputReader.readFile(filePath);
 
         // THEN
-        assertThat(simulationData.getSize()).isEqualTo(TestDataFactory.defaultSimulationSize());
-        assertThat(simulationData.getMountains()).isEqualTo(TestDataFactory.defaultMountains());
-        assertThat(simulationData.getTreasures()).isEqualTo(TestDataFactory.defaultTreasures());
-        assertThat(simulationData.getPlayers()).isEqualTo(of(TestDataFactory.playerLara()));
+        assertThat(builder.getSize()).isEqualTo(TestDataFactory.defaultSimulationSize());
+        assertThat(builder.getMountains()).isEqualTo(TestDataFactory.defaultMountains());
+        assertThat(builder.getTreasures()).isEqualTo(TestDataFactory.defaultTreasures());
+        assertThat(builder.getPlayers()).isEqualTo(of(lara()));
     }
 
     @Test
     void read_simulation_size() {
         // GIVEN
-        SimulationData simulationData = new SimulationData();
+        SimulationBuilder builder = Simulation.builder();
 
         // WHEN
-        InputReader.readLine("C - 3 - 4", simulationData);
+        InputReader.readLine("C - 3 - 4", builder);
 
         // THEN
-        assertThat(simulationData).extracting(SimulationData::getSize)
+        assertThat(builder).extracting(SimulationBuilder::getSize)
                 .isNotNull()
                 .isEqualTo(TestDataFactory.defaultSimulationSize());
     }
@@ -48,12 +49,11 @@ class InputReaderShould {
     @Test
     void throw_exception_if_read_simulation_size_but_already_defined() {
         // GIVEN
-        SimulationData simulationData = new SimulationData();
-        simulationData.setSize(new Simulation.Size(2, 4));
+        SimulationBuilder builder = Simulation.builder().withSize(2, 4);
 
         // WHEN
         String line = "C - 3 - 4";
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> InputReader.readLine(line, simulationData);
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> InputReader.readLine(line, builder);
 
         // THEN
         assertThatThrownBy(throwingCallable)
@@ -64,64 +64,70 @@ class InputReaderShould {
     @Test
     void read_mountains() {
         // GIVEN
-        SimulationData simulationData = new SimulationData();
+        SimulationBuilder builder = Simulation.builder();
 
         // WHEN
-        InputReader.readLine("M - 1 - 0", simulationData);
-        InputReader.readLine("M - 2 - 1", simulationData);
+        InputReader.readLine("M - 1 - 0", builder);
+        InputReader.readLine("M - 2 - 1", builder);
 
         // THEN
-        assertThat(simulationData.getMountains()).isEqualTo(TestDataFactory.defaultMountains());
+        List<Mountain> expected = of(new Mountain(1, 0),
+                new Mountain(2, 1));
+        assertThat(builder.getMountains()).isEqualTo(expected);
     }
 
     @Test
     void read_treasures() {
         // GIVEN
-        SimulationData simulationData = new SimulationData();
+        SimulationBuilder builder = Simulation.builder();
 
         // WHEN
-        InputReader.readLine("T - 0 - 3 - 2", simulationData);
-        InputReader.readLine("T - 1 - 3 - 3", simulationData);
+        InputReader.readLine("T - 0 - 3 - 2", builder);
+        InputReader.readLine("T - 1 - 3 - 3", builder);
 
         // THEN
-        assertThat(simulationData.getTreasures()).isEqualTo(TestDataFactory.defaultTreasures());
+        List<Treasure> expected = of(new Treasure(0, 3, 2),
+                new Treasure(1, 3, 3));
+        assertThat(builder.getTreasures()).isEqualTo(expected);
     }
 
     @Test
     void read_adventurers() {
         // GIVEN
-        SimulationData simulationData = new SimulationData();
+        SimulationBuilder builder = Simulation.builder();
 
         // WHEN
-        InputReader.readLine("A - Lara - 1 - 1 - S - AADADAGGA", simulationData);
-        InputReader.readLine("A - Jones - 2 - 2 - N - ADGGAGDDGA", simulationData);
+        InputReader.readLine("A - Lara - 1 - 1 - S - AADADAGGA", builder);
+        InputReader.readLine("A - Jones - 2 - 2 - N - ADGGAGDDGA", builder);
 
         // THEN
-        Player lara = TestDataFactory.playerLara();
-        Player jones = new Player("Jones",
+        List<Player> expected = of(lara(), jones());
+        assertThat(builder.getPlayers())
+                .usingRecursiveFieldByFieldElementComparator()
+                .isEqualTo(expected);
+    }
+
+    private Player jones() {
+        return new Player("Jones",
                 new Coordinates(2, 2),
                 NORTH,
                 of(A, D, G, G, A, G, D, D, G, A));
-        assertThat(simulationData.getPlayers())
-                .usingRecursiveFieldByFieldElementComparator()
-                .isEqualTo(of(lara, jones));
     }
 
     @Test
     void ignore_lines_starting_with_hash() {
         // GIVEN
-        SimulationData simulationData = new SimulationData();
+        SimulationBuilder builder = Simulation.builder();
 
         // WHEN
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> InputReader.readLine("# Comment", simulationData);
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> InputReader.readLine("# Comment", builder);
 
         // THEN
-        assertThatCode(throwingCallable)
-                .doesNotThrowAnyException();
-        assertThat(simulationData.getSize()).isNull();
-        assertThat(simulationData.getMountains()).isEmpty();
-        assertThat(simulationData.getTreasures()).isEmpty();
-        assertThat(simulationData.getPlayers()).isEmpty();
+        assertThatCode(throwingCallable).doesNotThrowAnyException();
+        assertThat(builder.getSize()).isNull();
+        assertThat(builder.getMountains()).isEmpty();
+        assertThat(builder.getTreasures()).isEmpty();
+        assertThat(builder.getPlayers()).isEmpty();
     }
 
     /**
@@ -139,17 +145,17 @@ class InputReaderShould {
     })
     void ignore_lines_starting_with_anything_else(String line) {
         // GIVEN
-        SimulationData simulationData = new SimulationData();
+        SimulationBuilder builder = Simulation.builder();
 
         // WHEN
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> InputReader.readLine(line, simulationData);
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> InputReader.readLine(line, builder);
 
         // THEN
         assertThatCode(throwingCallable)
                 .doesNotThrowAnyException();
-        assertThat(simulationData.getSize()).isNull();
-        assertThat(simulationData.getMountains()).isEmpty();
-        assertThat(simulationData.getTreasures()).isEmpty();
-        assertThat(simulationData.getPlayers()).isEmpty();
+        assertThat(builder.getSize()).isNull();
+        assertThat(builder.getMountains()).isEmpty();
+        assertThat(builder.getTreasures()).isEmpty();
+        assertThat(builder.getPlayers()).isEmpty();
     }
 }

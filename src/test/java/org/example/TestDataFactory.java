@@ -23,7 +23,7 @@ public class TestDataFactory {
                 new Treasure(1, 3, 3));
     }
 
-    public static Player playerLara() {
+    public static Player lara() {
         return new Player("Lara",
                 new Coordinates(1, 1),
                 SOUTH,

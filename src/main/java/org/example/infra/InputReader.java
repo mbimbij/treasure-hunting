@@ -15,20 +15,20 @@ public class InputReader {
     static final String SIZE_ALREADY_DEFINED_ERROR_MESSAGE_FORMAT = "Error reading line %s. Size already defined";
 
     @SneakyThrows
-    public static SimulationData readFile(String pathString) {
-        SimulationData simulationData = new SimulationData();
+    public static SimulationBuilder readFile(String pathString) {
+        SimulationBuilder simulationBuilder = new SimulationBuilder();
         Path path = Paths.get(pathString);
 
         try (Stream<String> lines = Files.lines(path, StandardCharsets.UTF_8);) {
             lines.forEach(line -> {
-                readLine(line, simulationData);
+                readLine(line, simulationBuilder);
             });
         }
 
-        return simulationData;
+        return simulationBuilder;
     }
 
-    static void readLine(String line, SimulationData simulationData) {
+    static void readLine(String line, SimulationBuilder simulationData) {
         if (line.startsWith("C")) {
             readSize(line, simulationData);
         } else if (line.startsWith("M")) {
@@ -40,7 +40,7 @@ public class InputReader {
         }
     }
 
-    private static void readPlayer(String line, SimulationData simulationData) {
+    private static void readPlayer(String line, SimulationBuilder simulationData) {
         String[] split = line.split("-");
         String name = split[1].trim();
         Coordinates coordinates = readCoordinates(split[2], split[3]);
@@ -62,7 +62,7 @@ public class InputReader {
                 .toList();
     }
 
-    private static void readTreasure(String line, SimulationData simulationData) {
+    private static void readTreasure(String line, SimulationBuilder simulationData) {
         String[] split = line.split("-");
         int weCoordinates = Integer.parseInt(split[1].trim());
         int nsCoordinates = Integer.parseInt(split[2].trim());
@@ -71,18 +71,17 @@ public class InputReader {
         simulationData.addTreasure(treasure);
     }
 
-    private static void readSize(String line, SimulationData simulationData) {
+    private static void readSize(String line, SimulationBuilder simulationData) {
         if (simulationData.getSize() != null) {
             throw new IllegalArgumentException(SIZE_ALREADY_DEFINED_ERROR_MESSAGE_FORMAT.formatted(line));
         }
         String[] split = line.split("-");
         int width = Integer.parseInt(split[1].trim());
         int height = Integer.parseInt(split[2].trim());
-        Simulation.Size size = new Simulation.Size(width, height);
-        simulationData.setSize(size);
+        simulationData.withSize(width, height);
     }
 
-    private static void readMountain(String line, SimulationData simulationData) {
+    private static void readMountain(String line, SimulationBuilder simulationData) {
         String[] split = line.split("-");
         Mountain mountain = new Mountain(readCoordinates(split[1], split[2]));
         simulationData.addMountain(mountain);

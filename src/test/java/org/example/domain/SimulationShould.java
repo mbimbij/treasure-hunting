@@ -25,7 +25,6 @@ import static org.mockito.Mockito.*;
 class SimulationShould {
 
     private static final Treasure TREASURE_AT_1_1 = new Treasure(1, 1, 3);
-    private static final Mountain MOUNTAIN_AT_1_1 = new Mountain(1, 1);
 
     private static final Player PLAYER_1 = new Player("Player #1",
             new Coordinates(1, 1),
@@ -40,7 +39,7 @@ class SimulationShould {
     @Property
     void create_simulation_with_specified_size(@ForAll("validPairsOfWidthAndHeight") Simulation.Size size) {
         // WHEN
-        Simulation madreDeDios = new Simulation(size, emptyList(), emptyList(), emptyList());
+        Simulation madreDeDios = Simulation.builder().withSize(size).build();
 
         // THEN
         assertThat(madreDeDios.getSize()).isEqualTo(size);
@@ -51,13 +50,15 @@ class SimulationShould {
         // GIVEN
         List<Mountain> mountains = of(
                 new Mountain(0, 0),
-                MOUNTAIN_AT_1_1,
-                new Mountain(new Coordinates(1, 2))
+                new Mountain(1, 1),
+                new Mountain(1, 2)
         );
 
         // WHEN
-        Simulation.Size size = new Simulation.Size(3, 4);
-        Simulation madreDeDios = new Simulation(size, mountains, emptyList(), emptyList());
+        Simulation madreDeDios = Simulation.builder()
+                .withSize(3, 4)
+                .withMountains(mountains)
+                .build();
 
         // THEN
         assertThat(madreDeDios.getMountains())
@@ -74,42 +75,49 @@ class SimulationShould {
         );
 
         // WHEN
-        Simulation.Size size = new Simulation.Size(3, 4);
-        Simulation madreDeDios = new Simulation(size, emptyList(), treasures, emptyList());
+        Simulation madreDeDios = Simulation.builder()
+                .withSize(3, 4)
+                .withTreasures(treasures)
+                .build();
 
         // THEN
+        List<Treasure> expected = of(
+                new Treasure(new Coordinates(1, 1).westEast(), new Coordinates(1, 1).northSouth(), 1),
+                new Treasure(new Coordinates(1, 2).westEast(), new Coordinates(1, 2).northSouth(), 2)
+        );
         assertThat(madreDeDios.getTreasures())
                 .usingRecursiveFieldByFieldElementComparator()
-                .isEqualTo(treasures);
+                .isEqualTo(expected);
     }
 
     @Test
     void create_simulation_with_players() {
         // GIVEN
-        List<Player> players = of(
-                PLAYER_1,
-                PLAYER_2
-        );
+        List<Player> players = of(PLAYER_1, PLAYER_2);
 
         // WHEN
-        Simulation.Size size = new Simulation.Size(3, 4);
-        Simulation madreDeDios = new Simulation(size, emptyList(), emptyList(), players);
+        Simulation madreDeDios = Simulation.builder()
+                .withSize(3, 4)
+                .withPlayers(players)
+                .build();
 
         // THEN
+        List<Player> expected = of(PLAYER_1, PLAYER_2);
         assertThat(madreDeDios.getPlayers())
                 .usingRecursiveFieldByFieldElementComparator()
-                .isEqualTo(players);
+                .isEqualTo(expected);
     }
 
     @Property
-    void throw_exception_for_invalid_width_or_height(@ForAll("invalidPairsOfWidthAndHeight") Simulation.Size pair) {
+    void throw_exception_for_invalid_width_or_height(@ForAll("invalidPairsOfWidthAndHeight") Simulation.Size size) {
         // GIVEN
-        Integer width = pair.width();
-        Integer height = pair.height();
-        String expectedErrorMessage = Simulation.INVALID_SIMULATION_SIZE_ERROR_MESSAGE_FORMAT.formatted(width, height);
+        String expectedErrorMessage = Simulation.INVALID_SIMULATION_SIZE_ERROR_MESSAGE_FORMAT
+                .formatted(size.width(), size.height());
 
         // WHEN
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> new Simulation(new Simulation.Size(width, height), emptyList(), emptyList(), emptyList());
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> Simulation.builder()
+                .withSize(size.width(), size.height())
+                .build();
 
         // THEN
         assertThatThrownBy(throwingCallable)
@@ -126,7 +134,10 @@ class SimulationShould {
                 .formatted(duplicatePlayersNames);
 
         // WHEN
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> new Simulation(new Simulation.Size(3, 4), emptyList(), emptyList(), players);
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> Simulation.builder()
+                .withSize(3, 4)
+                .withPlayers(players)
+                .build();
 
         // THEN
         assertThatThrownBy(throwingCallable)
@@ -169,7 +180,12 @@ class SimulationShould {
                 new Treasure(1, 3, 3)
         );
         Simulation.Size size = new Simulation.Size(width, height);
-        Simulation simulation = new Simulation(size, mountains, treasures, players);
+        Simulation simulation = Simulation.builder()
+                .withSize(size)
+                .withMountains(mountains)
+                .withTreasures(treasures)
+                .withPlayers(players)
+                .build();
 
         // WHEN
         simulation.moveForward(player1);
@@ -185,7 +201,10 @@ class SimulationShould {
         int height = 1;
         Player player = spy(new Player("player", new Coordinates(0, 0), NORTH));
         Simulation.Size size = new Simulation.Size(width, height);
-        Simulation simulation = new Simulation(size, emptyList(), emptyList(), of(player));
+        Simulation simulation = Simulation.builder()
+                .withSize(size)
+                .withPlayers(of(player))
+                .build();
 
         // WHEN
         simulation.turnLeft(player);
@@ -223,7 +242,11 @@ class SimulationShould {
         // Will be collected twice
         // Won't be collected
         // Will be collected once
-        Simulation simulation = new Simulation(size, emptyList(), treasures, of(player));
+        Simulation simulation = Simulation.builder()
+                .withSize(size)
+                .withTreasures(treasures)
+                .withPlayers(of(player))
+                .build();
 
         // WHEN
         simulation.moveForward(player);
@@ -248,8 +271,10 @@ class SimulationShould {
 
         List<Command> commands = of(A, G, D, D, G);
         Player player = new Player("player", new Coordinates(0, 0), NORTH, commands);
-        Simulation.Size size = new Simulation.Size(width, height);
-        Simulation simulation = spy(new Simulation(size, emptyList(), emptyList(), of(player)));
+        Simulation simulation = spy(Simulation.builder()
+                .withSize(width, height)
+                .withPlayers(of(player))
+                .build());
 
         // WHEN
         simulation.run();
@@ -271,7 +296,10 @@ class SimulationShould {
         Player player1 = new Player("player", new Coordinates(0, 0), EAST, of(A, G, D, D, G));
         Player player2 = new Player("player2", new Coordinates(2, 1), WEST, of(D, A, G));
         Simulation.Size size = new Simulation.Size(width, height);
-        Simulation simulation = spy(new Simulation(size, emptyList(), emptyList(), of(player1, player2)));
+        Simulation simulation = spy(Simulation.builder()
+                .withSize(width, height)
+                .withPlayers(of(player1, player2))
+                .build());
 
         // WHEN
         simulation.run();
@@ -307,7 +335,12 @@ class SimulationShould {
         List<Mountain> mountains = TestDataFactory.defaultMountains();
         List<Treasure> treasures = TestDataFactory.defaultTreasures();
         Simulation.Size size = new Simulation.Size(width, height);
-        Simulation simulation = new Simulation(size, mountains, treasures, of(playerBeforeSimulation));
+        Simulation simulation = Simulation.builder()
+                .withSize(size)
+                .withMountains(mountains)
+                .withTreasures(treasures)
+                .withPlayers(of(playerBeforeSimulation))
+                .build();
 
         // WHEN
         simulation.run();
@@ -382,6 +415,7 @@ class SimulationShould {
      */
     @Nested
     class OverlappingFeatures {
+        private static final Mountain MOUNTAIN_AT_1_1 = new Mountain(1, 1);
 
         private static final List<Player> OVERLAPPING_ADVENTURERS = of(
                 PLAYER_1,
@@ -422,7 +456,12 @@ class SimulationShould {
                     .formatted(expectedOverlap);
 
             // WHEN
-            ThrowableAssert.ThrowingCallable throwingCallable = () -> new Simulation(new Simulation.Size(3, 4), mountains, treasures, players);
+            ThrowableAssert.ThrowingCallable throwingCallable = () -> Simulation.builder()
+                    .withSize(3, 4)
+                    .withMountains(mountains)
+                    .withTreasures(treasures)
+                    .withPlayers(players)
+                    .build();
 
             // THEN
             assertThatThrownBy(throwingCallable)
@@ -465,7 +504,12 @@ class SimulationShould {
                     .formatted(expectedInvalidCoordinates);
 
             // WHEN
-            ThrowableAssert.ThrowingCallable throwingCallable = () -> new Simulation(new Simulation.Size(width, height), mountains, treasures, players);
+            ThrowableAssert.ThrowingCallable throwingCallable = () -> Simulation.builder()
+                    .withSize(width, height)
+                    .withMountains(mountains)
+                    .withTreasures(treasures)
+                    .withPlayers(players)
+                    .build();
 
             // THEN
             assertThatThrownBy(throwingCallable)
@@ -491,8 +535,14 @@ class SimulationShould {
         private static Arguments multipleMountainsOutOfBounds() {
             return Arguments.of(width,
                     height,
-                    of(MOUNTAIN_AT_1_1, new Mountain(tooMuchSouth()), new Mountain(tooMuchWest())),
+                    of(new Mountain(inBound()),
+                            new Mountain(tooMuchSouth()),
+                            new Mountain(tooMuchWest())),
                     of(tooMuchSouth(), tooMuchWest()));
+        }
+
+        private static Coordinates inBound() {
+            return new Coordinates(1, 1);
         }
 
         private static Coordinates tooMuchSouth() {

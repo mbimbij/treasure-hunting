@@ -34,12 +34,22 @@ public class Simulation {
     // TODO question au PO: min joueur: 0 ou 1 ? max joueurs: un nombre constant, en entrée de l'application, ou calculé en
     private final List<Player> players;
 
-    public Simulation(Size size, List<Mountain> mountains, List<Treasure> treasures, List<Player> players) {
+    /**
+     * Do not call directly, use <code>SimulationBuilder</code> instead.
+     * @param size
+     * @param mountains
+     * @param treasures
+     * @param players
+     */
+    Simulation(Size size, List<Mountain> mountains, List<Treasure> treasures, List<Player> players) {
         this.size = size;
         this.mountains = mountains;
         this.treasures = treasures;
         this.players = players;
-        new SimulationValidator().validate(this);
+    }
+
+    public static SimulationBuilder builder() {
+        return new SimulationBuilder();
     }
 
     public void run() {
@@ -128,5 +138,4 @@ public class Simulation {
 
     public record Size(Integer width, Integer height) {
     }
-
 }
