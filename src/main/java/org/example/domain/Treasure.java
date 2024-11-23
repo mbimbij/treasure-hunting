@@ -14,10 +14,6 @@ public final class Treasure implements CanIntersectWith {
     private final Coordinates coordinates;
     private int quantity;
 
-    public Treasure(Coordinates coordinates, int quantity) {
-        this(coordinates.westEast(), coordinates.northSouth(), quantity);
-    }
-
     public Treasure(int weCoordinates, int nsCoordinates, int quantity) {
         this.coordinates = new Coordinates(weCoordinates, nsCoordinates);
         this.quantity = quantity;

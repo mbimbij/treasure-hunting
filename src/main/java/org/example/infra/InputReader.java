@@ -64,8 +64,10 @@ public class InputReader {
 
     private static void readTreasure(String line, SimulationData simulationData) {
         String[] split = line.split("-");
-        Treasure treasure = new Treasure(readCoordinates(split[1], split[2]),
-                Integer.parseInt(split[3].trim()));
+        int weCoordinates = Integer.parseInt(split[1].trim());
+        int nsCoordinates = Integer.parseInt(split[2].trim());
+        int quantity = Integer.parseInt(split[3].trim());
+        Treasure treasure = new Treasure(weCoordinates, nsCoordinates, quantity);
         simulationData.addTreasure(treasure);
     }
 
@@ -74,8 +76,9 @@ public class InputReader {
             throw new IllegalArgumentException(SIZE_ALREADY_DEFINED_ERROR_MESSAGE_FORMAT.formatted(line));
         }
         String[] split = line.split("-");
-        Simulation.Size size = new Simulation.Size(Integer.parseInt(split[1].trim()),
-                Integer.parseInt(split[2].trim()));
+        int width = Integer.parseInt(split[1].trim());
+        int height = Integer.parseInt(split[2].trim());
+        Simulation.Size size = new Simulation.Size(width, height);
         simulationData.setSize(size);
     }
 

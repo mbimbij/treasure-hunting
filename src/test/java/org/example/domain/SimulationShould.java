@@ -24,8 +24,8 @@ import static org.mockito.Mockito.*;
 
 class SimulationShould {
 
-    private static final Treasure TREASURE_AT_1_1 = new Treasure(new Coordinates(1, 1), 3);
-    private static final Mountain MOUNTAIN_AT_1_1 = new Mountain(new Coordinates(1, 1));
+    private static final Treasure TREASURE_AT_1_1 = new Treasure(1, 1, 3);
+    private static final Mountain MOUNTAIN_AT_1_1 = new Mountain(1, 1);
 
     private static final Player PLAYER_1 = new Player("Player #1",
             new Coordinates(1, 1),
@@ -69,8 +69,8 @@ class SimulationShould {
     void create_simulation_with_treasures() {
         // GIVEN
         List<Treasure> treasures = of(
-                new Treasure(new Coordinates(1, 1), 1),
-                new Treasure(new Coordinates(1, 2), 2)
+                new Treasure(new Coordinates(1, 1).westEast(), new Coordinates(1, 1).northSouth(), 1),
+                new Treasure(new Coordinates(1, 2).westEast(), new Coordinates(1, 2).northSouth(), 2)
         );
 
         // WHEN
@@ -315,7 +315,7 @@ class SimulationShould {
         // THEN
         assertThat(simulation.getPlayers())
                 .singleElement()
-                .satisfies(l ->{
+                .satisfies(l -> {
                     assertThat(l).usingRecursiveComparison()
                             .isEqualTo(expectedPlayerAfterSimulation);
                 });
@@ -395,8 +395,8 @@ class SimulationShould {
 
         private static final List<Treasure> OVERLAPPING_TREASURES = of(
                 TREASURE_AT_1_1,
-                new Treasure(new Coordinates(1, 1), 2),
-                new Treasure(new Coordinates(1, 2), 2)
+                new Treasure(1, 1, 2),
+                new Treasure(1, 2, 2)
         );
 
         /**
