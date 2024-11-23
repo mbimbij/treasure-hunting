@@ -198,12 +198,12 @@ public class Simulation {
         Map<String, Long> playersCountByName = this.players.stream()
                 .collect(groupingBy(Player::getName, counting()));
 
-        Map<String, Long> duplicateAlayersNames = MapStream.of(playersCountByName)
+        Map<String, Long> duplicatePlayersNames = MapStream.of(playersCountByName)
                 .filterValue(count -> count > 1)
                 .toMap();
 
-        if (!duplicateAlayersNames.isEmpty()) {
-            String duplicatePlayersNamesString = duplicateAlayersNames.keySet().toString();
+        if (!duplicatePlayersNames.isEmpty()) {
+            String duplicatePlayersNamesString = duplicatePlayersNames.keySet().toString();
             String message = DUPLICATE_PLAYERS_NAMES_ERROR_MESSAGE_FORMAT.formatted(duplicatePlayersNamesString);
             throw new IllegalArgumentException(message);
         }

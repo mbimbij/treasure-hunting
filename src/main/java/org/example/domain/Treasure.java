@@ -15,22 +15,15 @@ public final class Treasure implements CanIntersectWith {
     private int quantity;
 
     public Treasure(Coordinates coordinates, int quantity) {
-        this.coordinates = coordinates;
+        this(coordinates.westEast(), coordinates.northSouth(), quantity);
+    }
+
+    public Treasure(int weCoordinates, int nsCoordinates, int quantity) {
+        this.coordinates = new Coordinates(weCoordinates, nsCoordinates);
         this.quantity = quantity;
         if(this.quantity < 0) {
             throw new IllegalArgumentException(CREATE_WITH_NEGATIVE_QUANTITY_ERROR_MESSAGE);
         }
-    }
-
-    public Treasure(int weCoordinates, int nsCoordinates, int quantity) {
-        this(new Coordinates(weCoordinates, nsCoordinates), quantity);
-    }
-
-    public void collectTreasure() {
-        if (this.isEmpty()) {
-            throw new IllegalStateException(COLLECT_EMPTY_TREASURE_ERROR_MESSAGE);
-        }
-        this.quantity--;
     }
 
     public int quantity() {
@@ -39,5 +32,12 @@ public final class Treasure implements CanIntersectWith {
 
     public boolean isEmpty() {
         return quantity() <= 0;
+    }
+
+    void collectTreasure() {
+        if (this.isEmpty()) {
+            throw new IllegalStateException(COLLECT_EMPTY_TREASURE_ERROR_MESSAGE);
+        }
+        this.quantity--;
     }
 }

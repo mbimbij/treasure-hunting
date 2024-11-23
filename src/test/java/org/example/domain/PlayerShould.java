@@ -63,7 +63,7 @@ class PlayerShould {
         assertThat(player.getOrientation()).isEqualTo(expectedOrientationAfter);
     }
 
-    static Stream<Arguments> move_forward(){
+    private static Stream<Arguments> move_forward(){
         Player facingNorth = new Player("player", new Coordinates(1, 1), NORTH);
         Player facingEast = new Player("player", new Coordinates(1, 1), EAST);
         Player facingSouth = new Player("player", new Coordinates(1, 1), SOUTH);

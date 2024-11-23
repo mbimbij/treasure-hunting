@@ -14,10 +14,10 @@ public class OutputWriter {
         System.out.printf("printing the simulation results to %s%n", pathString);
         System.out.println(formatterSimulation);
         Path path = Paths.get(pathString);
-        setupAndVerifyOutputFile(path);
+        setupOutputFile(path);
         Files.writeString(path, formatterSimulation, StandardCharsets.UTF_8);
     }
-    private static void setupAndVerifyOutputFile(Path path) throws IOException {
+    private static void setupOutputFile(Path path) throws IOException {
         Files.deleteIfExists(path);
         Files.createFile(path);
     }

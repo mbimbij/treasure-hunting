@@ -25,9 +25,9 @@ class InputReaderShould {
         SimulationData simulationData = InputReader.readFile(filePath);
 
         // THEN
-        assertThat(simulationData.getSize()).isEqualTo(TestDataFactory.sizeFromInstructions());
-        assertThat(simulationData.getMountains()).isEqualTo(TestDataFactory.mountainsFromInstructions());
-        assertThat(simulationData.getTreasures()).isEqualTo(TestDataFactory.treasuresFromInstructions());
+        assertThat(simulationData.getSize()).isEqualTo(TestDataFactory.defaultSimulationSize());
+        assertThat(simulationData.getMountains()).isEqualTo(TestDataFactory.defaultMountains());
+        assertThat(simulationData.getTreasures()).isEqualTo(TestDataFactory.defaultTreasures());
         assertThat(simulationData.getPlayers()).isEqualTo(of(TestDataFactory.playerLara()));
     }
 
@@ -42,7 +42,7 @@ class InputReaderShould {
         // THEN
         assertThat(simulationData).extracting(SimulationData::getSize)
                 .isNotNull()
-                .isEqualTo(TestDataFactory.sizeFromInstructions());
+                .isEqualTo(TestDataFactory.defaultSimulationSize());
     }
 
     @Test
@@ -71,7 +71,7 @@ class InputReaderShould {
         InputReader.readLine("M - 2 - 1", simulationData);
 
         // THEN
-        assertThat(simulationData.getMountains()).isEqualTo(TestDataFactory.mountainsFromInstructions());
+        assertThat(simulationData.getMountains()).isEqualTo(TestDataFactory.defaultMountains());
     }
 
     @Test
@@ -84,7 +84,7 @@ class InputReaderShould {
         InputReader.readLine("T - 1 - 3 - 3", simulationData);
 
         // THEN
-        assertThat(simulationData.getTreasures()).isEqualTo(TestDataFactory.treasuresFromInstructions());
+        assertThat(simulationData.getTreasures()).isEqualTo(TestDataFactory.defaultTreasures());
     }
 
     @Test

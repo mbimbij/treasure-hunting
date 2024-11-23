@@ -24,20 +24,17 @@ import static org.mockito.Mockito.*;
 
 class SimulationShould {
 
-    private static final Coordinates COORDINATES_1_1 = new Coordinates(1, 1);
-    private static final Coordinates COORDINATES_1_2 = new Coordinates(1, 2);
-    private static final Coordinates COORDINATES_1_3 = new Coordinates(1, 3);
-    private static final Treasure TREASURE_AT_1_1 = new Treasure(COORDINATES_1_1, 3);
-    private static final Mountain MOUNTAIN_AT_1_1 = new Mountain(COORDINATES_1_1);
+    private static final Treasure TREASURE_AT_1_1 = new Treasure(new Coordinates(1, 1), 3);
+    private static final Mountain MOUNTAIN_AT_1_1 = new Mountain(new Coordinates(1, 1));
 
     private static final Player PLAYER_1 = new Player("Player #1",
-            COORDINATES_1_1,
+            new Coordinates(1, 1),
             NORTH);
     private static final Player PLAYER_2 = new Player("Player #2",
-            COORDINATES_1_2,
+            new Coordinates(1, 2),
             NORTH);
     private static final Player PLAYER_3 = new Player("Player #3",
-            COORDINATES_1_3,
+            new Coordinates(1, 3),
             NORTH);
 
     @Property
@@ -55,7 +52,7 @@ class SimulationShould {
         List<Mountain> mountains = of(
                 new Mountain(0, 0),
                 MOUNTAIN_AT_1_1,
-                new Mountain(COORDINATES_1_2)
+                new Mountain(new Coordinates(1, 2))
         );
 
         // WHEN
@@ -72,8 +69,8 @@ class SimulationShould {
     void create_simulation_with_treasures() {
         // GIVEN
         List<Treasure> treasures = of(
-                new Treasure(COORDINATES_1_1, 1),
-                new Treasure(COORDINATES_1_2, 2)
+                new Treasure(new Coordinates(1, 1), 1),
+                new Treasure(new Coordinates(1, 2), 2)
         );
 
         // WHEN
@@ -307,8 +304,8 @@ class SimulationShould {
                 SOUTH,
                 3,
                 emptyList());
-        List<Mountain> mountains = TestDataFactory.mountainsFromInstructions();
-        List<Treasure> treasures = TestDataFactory.treasuresFromInstructions();
+        List<Mountain> mountains = TestDataFactory.defaultMountains();
+        List<Treasure> treasures = TestDataFactory.defaultTreasures();
         Simulation.Size size = new Simulation.Size(width, height);
         Simulation simulation = new Simulation(size, mountains, treasures, of(playerBeforeSimulation));
 
@@ -347,7 +344,7 @@ class SimulationShould {
     }
 
     private static Stream<Arguments> throw_exception_if_multiple_players_have_the_same_name() {
-        Arguments oneDuplicate = Arguments.of(of(PLAYER_1, PLAYER_1.withCoordinates(COORDINATES_1_2)), of(PLAYER_1.getName()));
+        Arguments oneDuplicate = Arguments.of(of(PLAYER_1, PLAYER_1.withCoordinates(new Coordinates(1, 2))), of(PLAYER_1.getName()));
         Arguments twoDuplicates = Arguments.of(of(
                         PLAYER_1.withCoordinates(new Coordinates(0, 0)),
                         PLAYER_1.withCoordinates(new Coordinates(0, 1)),
@@ -393,13 +390,13 @@ class SimulationShould {
         private static final List<Mountain> OVERLAPPING_MOUNTAINS = of(
                 MOUNTAIN_AT_1_1,
                 MOUNTAIN_AT_1_1,
-                new Mountain(COORDINATES_1_2)
+                new Mountain(new Coordinates(1, 2))
         );
 
         private static final List<Treasure> OVERLAPPING_TREASURES = of(
                 TREASURE_AT_1_1,
-                new Treasure(COORDINATES_1_1, 2),
-                new Treasure(COORDINATES_1_2, 2)
+                new Treasure(new Coordinates(1, 1), 2),
+                new Treasure(new Coordinates(1, 2), 2)
         );
 
         /**
@@ -420,7 +417,7 @@ class SimulationShould {
                                                      List<Treasure> treasures,
                                                      List<Player> players) {
             // GIVEN
-            List<Coordinates> expectedOverlap = of(COORDINATES_1_1);
+            List<Coordinates> expectedOverlap = of(new Coordinates(1, 1));
             String expectedErrorMessage = Simulation.OVERLAPPING_FEATURES_ERROR_MESSAGE_FORMAT
                     .formatted(expectedOverlap);
 

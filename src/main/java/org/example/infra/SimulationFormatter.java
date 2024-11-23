@@ -14,41 +14,6 @@ public class SimulationFormatter {
 
     private final String newLine = System.lineSeparator();
 
-    public String formatSize(Simulation.Size size) {
-        return "C - %d - %d".formatted(size.width(), size.height());
-    }
-
-    public String formatMountain(Mountain mountain) {
-        int weCoordinates = mountain.getCoordinates().westEast();
-        int nsCoordinates = mountain.getCoordinates().northSouth();
-        return "M - %d - %d".formatted(weCoordinates, nsCoordinates);
-    }
-
-    public String formatTreasure(Treasure treasure) {
-        int weCoordinates = treasure.getCoordinates().westEast();
-        int nsCoordinates = treasure.getCoordinates().northSouth();
-        int remainingQuantity = treasure.quantity();
-        return "T - %d - %d - %d".formatted(weCoordinates, nsCoordinates, remainingQuantity);
-    }
-
-    public String formatTreasures(List<Treasure> treasures) {
-        StringWriter stringWriter = new StringWriter();
-        PrintWriter printWriter = new PrintWriter(stringWriter);
-        return treasures.stream().filter(treasure -> !treasure.isEmpty())
-                .map(this::formatTreasure)
-                .collect(Collectors.joining(newLine));
-    }
-
-    public String formatPlayer(Player player) {
-        return "A - %s - %d - %d - %s - %d".formatted(
-                player.getName(),
-                player.getCoordinates().westEast(),
-                player.getCoordinates().northSouth(),
-                OrientationData.from(player.getOrientation()),
-                player.getCollectedTreasuresCount()
-        );
-    }
-
     public String formatSimulation(Simulation simulation) {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
@@ -57,6 +22,41 @@ public class SimulationFormatter {
         printWriter.println(formatTreasures(simulation.getTreasures()));
         printWriter.println(formatPlayers(simulation.getPlayers()));
         return stringWriter.toString();
+    }
+
+    String formatSize(Simulation.Size size) {
+        return "C - %d - %d".formatted(size.width(), size.height());
+    }
+
+    String formatMountain(Mountain mountain) {
+        int weCoordinates = mountain.getCoordinates().westEast();
+        int nsCoordinates = mountain.getCoordinates().northSouth();
+        return "M - %d - %d".formatted(weCoordinates, nsCoordinates);
+    }
+
+    String formatTreasure(Treasure treasure) {
+        int weCoordinates = treasure.getCoordinates().westEast();
+        int nsCoordinates = treasure.getCoordinates().northSouth();
+        int remainingQuantity = treasure.quantity();
+        return "T - %d - %d - %d".formatted(weCoordinates, nsCoordinates, remainingQuantity);
+    }
+
+    String formatTreasures(List<Treasure> treasures) {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        return treasures.stream().filter(treasure -> !treasure.isEmpty())
+                .map(this::formatTreasure)
+                .collect(Collectors.joining(newLine));
+    }
+
+    String formatPlayer(Player player) {
+        return "A - %s - %d - %d - %s - %d".formatted(
+                player.getName(),
+                player.getCoordinates().westEast(),
+                player.getCoordinates().northSouth(),
+                OrientationData.from(player.getOrientation()),
+                player.getCollectedTreasuresCount()
+        );
     }
 
     private String formatPlayers(List<Player> players) {

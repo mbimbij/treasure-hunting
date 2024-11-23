@@ -1,11 +1,7 @@
 package org.example.infra;
 
 import lombok.SneakyThrows;
-import org.example.domain.Mountain;
-import org.example.domain.Player;
-import org.example.domain.Simulation;
-import org.example.domain.Treasure;
-import org.junit.jupiter.api.BeforeEach;
+import org.example.domain.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -13,6 +9,7 @@ import java.util.List;
 import static java.util.List.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.example.TestDataFactory.*;
+import static org.example.domain.Orientation.SOUTH;
 
 class SimulationFormatterShould {
 
@@ -22,8 +19,8 @@ class SimulationFormatterShould {
     @Test
     void format_entire_simulation_results() {
         // GIVEN a setup similar to the instructions, BUT without player and treasure overlap AND an empty treasure chest
-        Simulation simulation = new Simulation(sizeFromInstructions(),
-                mountainsFromInstructions(),
+        Simulation simulation = new Simulation(defaultSimulationSize(),
+                defaultMountains(),
                 of(new Treasure(0, 3, 0),
                         new Treasure(1, 3, 3)
                 ),
@@ -45,7 +42,7 @@ class SimulationFormatterShould {
     @Test
     void format_simulation_size_appropriately() {
         // GIVEN
-        Simulation.Size size = sizeFromInstructions();
+        Simulation.Size size = defaultSimulationSize();
 
         // WHEN
         String formattedSize = formatter.formatSize(size);
@@ -115,10 +112,13 @@ class SimulationFormatterShould {
     @Test
     void format_player_appropriately() {
         // GIVEN
-        Player player = playerLaraAfterSimulation();
+        Player defaultPlayerAfterSimulation = playerLara()
+                .withCoordinates(new Coordinates(0, 3))
+                .withOrientation(SOUTH)
+                .withCollectedTreasuresCount(3);
 
         // WHEN
-        String formattedPlayer = formatter.formatPlayer(player);
+        String formattedPlayer = formatter.formatPlayer(defaultPlayerAfterSimulation);
 
         // THEN
         assertThat(formattedPlayer).isEqualTo("A - Lara - 0 - 3 - S - 3");

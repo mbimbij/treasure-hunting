@@ -28,7 +28,7 @@ public class InputReader {
         return simulationData;
     }
 
-    public static void readLine(String line, SimulationData simulationData) {
+    static void readLine(String line, SimulationData simulationData) {
         if (line.startsWith("C")) {
             readSize(line, simulationData);
         } else if (line.startsWith("M")) {
