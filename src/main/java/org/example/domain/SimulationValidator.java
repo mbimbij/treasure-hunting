@@ -11,6 +11,10 @@ import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 
 class SimulationValidator {
+    public static final String OVERLAPPING_FEATURES_ERROR_MESSAGE_FORMAT = "Cannot build simulation because of overlapping features at %s";
+    public static final String DUPLICATE_PLAYERS_NAMES_ERROR_MESSAGE_FORMAT = "Cannot build simulation because of duplicate players names: %s";
+    public static final String INVALID_SIMULATION_SIZE_ERROR_MESSAGE_FORMAT = "Width and height must be greater than zero but were {%d, %d}";
+    public static final String FEATURES_COORDINATES_OUT_OF_BOUND_ERROR_MESSAGE = "Some features are located outside the simulation: %s";
     private final Simulation simulation;
 
     public SimulationValidator(Simulation simulation) {
@@ -31,7 +35,7 @@ class SimulationValidator {
 
     void validateSimulationSize(Simulation.Size simulationSize) {
         if (simulationSize.width() <= 0 || simulationSize.height() <= 0) {
-            String message = Simulation.INVALID_SIMULATION_SIZE_ERROR_MESSAGE_FORMAT.formatted(simulationSize.width(), simulationSize.height());
+            String message = INVALID_SIMULATION_SIZE_ERROR_MESSAGE_FORMAT.formatted(simulationSize.width(), simulationSize.height());
             throw new IllegalArgumentException(message);
         }
     }
@@ -53,7 +57,7 @@ class SimulationValidator {
 
         if (!overlapsCountByCoordinate.isEmpty()) {
             String overlapsString = overlapsCountByCoordinate.keySet().toString();
-            String message = Simulation.OVERLAPPING_FEATURES_ERROR_MESSAGE_FORMAT.formatted(overlapsString);
+            String message = OVERLAPPING_FEATURES_ERROR_MESSAGE_FORMAT.formatted(overlapsString);
             throw new IllegalArgumentException(message);
         }
     }
@@ -63,7 +67,7 @@ class SimulationValidator {
                 .filter(simulation::isOutOfBound)
                 .collect(groupingBy(identity(), counting()));
         if (!outOfBoundFeatureCoordinates.isEmpty()) {
-            String message = Simulation.FEATURES_COORDINATES_OUT_OF_BOUND_ERROR_MESSAGE
+            String message = FEATURES_COORDINATES_OUT_OF_BOUND_ERROR_MESSAGE
                     .formatted(outOfBoundFeatureCoordinates.keySet());
             throw new IllegalArgumentException(message);
         }
@@ -91,7 +95,7 @@ class SimulationValidator {
 
         if (!duplicatePlayersNames.isEmpty()) {
             String duplicatePlayersNamesString = duplicatePlayersNames.keySet().toString();
-            String message = Simulation.DUPLICATE_PLAYERS_NAMES_ERROR_MESSAGE_FORMAT.formatted(duplicatePlayersNamesString);
+            String message = DUPLICATE_PLAYERS_NAMES_ERROR_MESSAGE_FORMAT.formatted(duplicatePlayersNamesString);
             throw new IllegalArgumentException(message);
         }
     }

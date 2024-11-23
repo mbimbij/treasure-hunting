@@ -20,11 +20,6 @@ import static java.util.stream.Collectors.groupingBy;
  */
 @Getter
 public class Simulation {
-    public static final String OVERLAPPING_FEATURES_ERROR_MESSAGE_FORMAT = "Cannot build simulation because of overlapping features at %s";
-    public static final String DUPLICATE_PLAYERS_NAMES_ERROR_MESSAGE_FORMAT = "Cannot build simulation because of duplicate players names: %s";
-    public static final String INVALID_SIMULATION_SIZE_ERROR_MESSAGE_FORMAT = "Width and height must be greater than zero but were {%d, %d}";
-    public static final String FEATURES_COORDINATES_OUT_OF_BOUND_ERROR_MESSAGE = "Some features are located outside the simulation: %s";
-
     // TODO question au PO: min et max pour la largeur et la hauteur de la carte ? Si oui, amha, la validation devrait être sortie de la classe Simulation, mais il y a de bons arguments pour le contraire.
     private final Size size;
     // TODO question au PO: min montagnes: 0  1 ? max montagnes: un nombre constant, en entrée de l'application, ou calculé en fonction de la taille de la carte et du nombre de features ?

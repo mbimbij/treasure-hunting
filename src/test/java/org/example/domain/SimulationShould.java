@@ -111,7 +111,7 @@ class SimulationShould {
     @Property
     void throw_exception_for_invalid_width_or_height(@ForAll("invalidPairsOfWidthAndHeight") Simulation.Size size) {
         // GIVEN
-        String expectedErrorMessage = Simulation.INVALID_SIMULATION_SIZE_ERROR_MESSAGE_FORMAT
+        String expectedErrorMessage = SimulationValidator.INVALID_SIMULATION_SIZE_ERROR_MESSAGE_FORMAT
                 .formatted(size.width(), size.height());
 
         // WHEN
@@ -130,7 +130,7 @@ class SimulationShould {
     @MethodSource
     void throw_exception_if_multiple_players_have_the_same_name(List<Player> players, List<String> duplicatePlayersNames) {
         // GIVEN
-        String expectedErrorMessage = Simulation.DUPLICATE_PLAYERS_NAMES_ERROR_MESSAGE_FORMAT
+        String expectedErrorMessage = SimulationValidator.DUPLICATE_PLAYERS_NAMES_ERROR_MESSAGE_FORMAT
                 .formatted(duplicatePlayersNames);
 
         // WHEN
@@ -452,7 +452,7 @@ class SimulationShould {
                                                      List<Player> players) {
             // GIVEN
             List<Coordinates> expectedOverlap = of(new Coordinates(1, 1));
-            String expectedErrorMessage = Simulation.OVERLAPPING_FEATURES_ERROR_MESSAGE_FORMAT
+            String expectedErrorMessage = SimulationValidator.OVERLAPPING_FEATURES_ERROR_MESSAGE_FORMAT
                     .formatted(expectedOverlap);
 
             // WHEN
@@ -500,7 +500,7 @@ class SimulationShould {
             List<Treasure> treasures = emptyList();
             List<Player> players = emptyList();
 
-            String expectedErrorMessage = Simulation.FEATURES_COORDINATES_OUT_OF_BOUND_ERROR_MESSAGE
+            String expectedErrorMessage = SimulationValidator.FEATURES_COORDINATES_OUT_OF_BOUND_ERROR_MESSAGE
                     .formatted(expectedInvalidCoordinates);
 
             // WHEN
