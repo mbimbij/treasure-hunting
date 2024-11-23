@@ -1,15 +1,10 @@
 package org.example.domain;
 
-import com.speedment.common.mapstream.MapStream;
 import lombok.Getter;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 
 /**
@@ -44,11 +39,11 @@ public class Simulation {
         this.mountains = mountains;
         this.treasures = treasures;
         this.players = players;
-        validate();
+        new SimulationValidator().validate(this);
     }
 
     public void run() {
-        while (commandsRemaining()) {
+        while (areCommandsRemaining()) {
             playTurn();
         }
     }
@@ -113,43 +108,8 @@ public class Simulation {
         player.turnRight();
     }
 
-    boolean commandsRemaining() {
+    boolean areCommandsRemaining() {
         return players.stream().anyMatch(Player::hasRemainingCommands);
-    }
-
-    /**
-     * At the moment, as the application is simple enough, and for early stages of the project, i decided to place the
-     * have the simulation validate itself at construction time for the sake of simplicity and not over-engineer things.
-     * Also early on, data and validation itself was pretty cohesive
-     * <p>
-     * As the validation logic and the class itself grows, it might be appropriate to put it in either a Factory or a
-     * Validator, in order to 1) Prevent bloating, 2) enforce separation of concerns between validating simulation
-     * parameters and running the simulation itself.
-     * <p>
-     * Especially considering the possibility of validating min and max values for width, height, number of mountains,
-     * treasures, players. Or considering even more complex validation logic and creation logic, like procedural
-     * generation.
-     * <p>
-     * ETA: At that point the validation is large enough, and it is 100% valid to consider it a separate concern or
-     * "responsibility" / "reason to change". If time allows, it will be extracted
-     */
-    private void validate() {
-        validateSimulationSize();
-        validateNoOverlappingFeatures();
-        validateNoFeatureOutOfBound();
-        validateNoDuplicatePlayerName();
-    }
-
-    private void validateNoFeatureOutOfBound() {
-        List<Coordinates> allFeaturesCoordinates = getAllFeaturesCoordinates();
-        Map<Coordinates, Long> outOfBoundFeatureCoordinates = allFeaturesCoordinates.stream()
-                .filter(this::isOutOfBound)
-                .collect(groupingBy(identity(), counting()));
-        if (!outOfBoundFeatureCoordinates.isEmpty()) {
-            String message = FEATURES_COORDINATES_OUT_OF_BOUND_ERROR_MESSAGE
-                    .formatted(outOfBoundFeatureCoordinates.keySet());
-            throw new IllegalArgumentException(message);
-        }
     }
 
     /**
@@ -159,67 +119,14 @@ public class Simulation {
      * @param coordinates
      * @return
      */
-    private boolean isOutOfBound(Coordinates coordinates) {
+    public boolean isOutOfBound(Coordinates coordinates) {
         return coordinates.westEast() < 0
                || coordinates.westEast() >= size.width()
                || coordinates.northSouth() < 0
                || coordinates.northSouth() >= size.height();
     }
 
-    private void validateSimulationSize() {
-        if (this.size.width() <= 0 || this.size.height() <= 0) {
-            String message = INVALID_SIMULATION_SIZE_ERROR_MESSAGE_FORMAT.formatted(this.size.width(), this.size.height());
-            throw new IllegalArgumentException(message);
-        }
-    }
-
-    /**
-     * TODO validate with PO: an player cannot have its initial coordinates equal to one of the treasure.
-     * TODO explicit what features overlap to help with debugging (mountain, treasure, and later what line in the input file)
-     */
-    private void validateNoOverlappingFeatures() {
-        List<Coordinates> allFeaturesCoordinates = getAllFeaturesCoordinates();
-        Map<Coordinates, Long> featuresCountByCoordinate = allFeaturesCoordinates.stream()
-                .collect(groupingBy(identity(),
-                        counting()));
-
-        Map<Coordinates, Long> overlapsCountByCoordinate = MapStream.of(featuresCountByCoordinate)
-                .filterValue(count -> count > 1)
-                .toMap();
-
-        if (!overlapsCountByCoordinate.isEmpty()) {
-            String overlapsString = overlapsCountByCoordinate.keySet().toString();
-            String message = OVERLAPPING_FEATURES_ERROR_MESSAGE_FORMAT.formatted(overlapsString);
-            throw new IllegalArgumentException(message);
-        }
-    }
-
-    private void validateNoDuplicatePlayerName() {
-        Map<String, Long> playersCountByName = this.players.stream()
-                .collect(groupingBy(Player::getName, counting()));
-
-        Map<String, Long> duplicatePlayersNames = MapStream.of(playersCountByName)
-                .filterValue(count -> count > 1)
-                .toMap();
-
-        if (!duplicatePlayersNames.isEmpty()) {
-            String duplicatePlayersNamesString = duplicatePlayersNames.keySet().toString();
-            String message = DUPLICATE_PLAYERS_NAMES_ERROR_MESSAGE_FORMAT.formatted(duplicatePlayersNamesString);
-            throw new IllegalArgumentException(message);
-        }
-    }
-
-    private List<Coordinates> getAllFeaturesCoordinates() {
-        List<Coordinates> treasuresCoordinates = this.treasures.stream().map(Treasure::getCoordinates).toList();
-        List<Coordinates> mountainsCoordinates = this.mountains.stream().map(Mountain::getCoordinates).toList();
-        List<Coordinates> playersCoordinates = this.getPlayers().stream().map(Player::getCoordinates).toList();
-        List<Coordinates> allFeaturesCoordinates = new ArrayList<>();
-        allFeaturesCoordinates.addAll(treasuresCoordinates);
-        allFeaturesCoordinates.addAll(mountainsCoordinates);
-        allFeaturesCoordinates.addAll(playersCoordinates);
-        return allFeaturesCoordinates;
-    }
-
     public record Size(Integer width, Integer height) {
     }
+
 }
