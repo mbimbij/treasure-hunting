@@ -19,12 +19,14 @@ class SimulationFormatterShould {
     @Test
     void format_entire_simulation_results() {
         // GIVEN a setup similar to the instructions, BUT without player and treasure overlap AND an empty treasure chest
-        Simulation simulation = new Simulation(defaultSimulationSize(),
-                defaultMountains(),
-                of(new Treasure(0, 3, 0),
-                        new Treasure(1, 3, 3)
-                ),
-                of(playerLara()));
+        List<Treasure> treasures = of(new Treasure(0, 3, 0),
+                new Treasure(1, 3, 3));
+        Simulation simulation = Simulation.builder()
+                .withSize(defaultSimulationSize())
+                .withMountains(defaultMountains())
+                .withTreasures(treasures)
+                .withPlayers(of(lara()))
+                .build();
 
         // WHEN
         String formattedSimulation = formatter.formatSimulation(simulation);
@@ -112,7 +114,7 @@ class SimulationFormatterShould {
     @Test
     void format_player_appropriately() {
         // GIVEN
-        Player defaultPlayerAfterSimulation = playerLara()
+        Player defaultPlayerAfterSimulation = lara()
                 .withCoordinates(new Coordinates(0, 3))
                 .withOrientation(SOUTH)
                 .withCollectedTreasuresCount(3);

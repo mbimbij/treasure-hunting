@@ -42,6 +42,10 @@ public class Simulation {
         new SimulationValidator().validate(this);
     }
 
+    public static SimulationBuilder builder() {
+        return new SimulationBuilder();
+    }
+
     public void run() {
         while (areCommandsRemaining()) {
             playTurn();

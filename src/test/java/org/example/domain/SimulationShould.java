@@ -25,7 +25,6 @@ import static org.mockito.Mockito.*;
 class SimulationShould {
 
     private static final Treasure TREASURE_AT_1_1 = new Treasure(1, 1, 3);
-    private static final Mountain MOUNTAIN_AT_1_1 = new Mountain(1, 1);
 
     private static final Player PLAYER_1 = new Player("Player #1",
             new Coordinates(1, 1),
@@ -40,7 +39,7 @@ class SimulationShould {
     @Property
     void create_simulation_with_specified_size(@ForAll("validPairsOfWidthAndHeight") Simulation.Size size) {
         // WHEN
-        Simulation madreDeDios = new Simulation(size, emptyList(), emptyList(), emptyList());
+        Simulation madreDeDios = Simulation.builder().withSize(size).build();
 
         // THEN
         assertThat(madreDeDios.getSize()).isEqualTo(size);
@@ -51,13 +50,15 @@ class SimulationShould {
         // GIVEN
         List<Mountain> mountains = of(
                 new Mountain(0, 0),
-                MOUNTAIN_AT_1_1,
+                new Mountain(1, 1),
                 new Mountain(new Coordinates(1, 2))
         );
 
         // WHEN
-        Simulation.Size size = new Simulation.Size(3, 4);
-        Simulation madreDeDios = new Simulation(size, mountains, emptyList(), emptyList());
+        Simulation madreDeDios = Simulation.builder()
+                .withSize(3,4)
+                .withMountains(mountains)
+                .build();
 
         // THEN
         assertThat(madreDeDios.getMountains())
@@ -382,6 +383,7 @@ class SimulationShould {
      */
     @Nested
     class OverlappingFeatures {
+        private static final Mountain MOUNTAIN_AT_1_1 = new Mountain(1, 1);
 
         private static final List<Player> OVERLAPPING_ADVENTURERS = of(
                 PLAYER_1,
@@ -491,8 +493,14 @@ class SimulationShould {
         private static Arguments multipleMountainsOutOfBounds() {
             return Arguments.of(width,
                     height,
-                    of(MOUNTAIN_AT_1_1, new Mountain(tooMuchSouth()), new Mountain(tooMuchWest())),
+                    of(new Mountain(inBound()),
+                            new Mountain(tooMuchSouth()),
+                            new Mountain(tooMuchWest())),
                     of(tooMuchSouth(), tooMuchWest()));
+        }
+
+        private static Coordinates inBound() {
+            return new Coordinates(1, 1);
         }
 
         private static Coordinates tooMuchSouth() {
