@@ -2,6 +2,11 @@
 
 Résolution de l'exercice tel que défini dans la consigne.
 
+## Pré-requis
+
+- Java 21
+- (optionnel) Maven (ou utiliser maven wrapper `./mvnw`)
+
 ## Exécution des tests
 
 `mvn clean test` or `./mvnw clean test`
